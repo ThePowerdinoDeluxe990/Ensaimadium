@@ -3,19 +3,21 @@ import socket
 
 class URL:
     def __init__(self, url):
-        self.scheme, url = url.split("://", 1)
-        assert self.scheme in ["http","https"]
-        if "/" not in url:
-            url = url + "/"
-        self.host, url = url.split("/", 1)
-        self.path = "/" + url
-        if self.scheme == "http":
-            self.port = 80
-        elif self.scheme == "https":
-            self.port = 443
+        try:
+            self.scheme, url = url.split("://", 1)
+            assert self.scheme in ["http","https"]
+            if "/" not in url:
+                url = url + "/"
+            self.host, url = url.split("/", 1)
+            self.path = "/" + url
+            if self.scheme == "http":
+                self.port = 80
+            elif self.scheme == "https":
+                self.port = 443
+        except:
+            url = ""
 
     def request(self):
-
        s = socket.socket(
            family=socket.AF_INET,
            type=socket.SOCK_STREAM,

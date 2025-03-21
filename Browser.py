@@ -1,33 +1,55 @@
 import tkinter
-
+import tkinter.font
 WIDTH, HEIGHT = 800,600
 
+HSTEP, VSTEP = 13, 18
+SCROLL_STEP = 100
+from Rendering.Text_Tag import Text, Tag
+
 class Browser:
+    def load(self, url):
+        body = url.request()
+        text = lex(body)
+        self.display_list = layout(text)
+        self.draw()
+
     def __init__(self):
         self.window = tkinter.Tk()
         self.Canvas = tkinter.Canvas(
             self.window,
             width = WIDTH,
-            height = HEIGHT
+            height = HEIGHT,
         )
         self.Canvas.pack()
+        self.scroll = 0
+        self.window.bind("<Down>", self.scrolldown)
 
+    def draw(self):
+        self.Canvas.delete("all")
+        for x,y,c in self.display_list:
+            if y > self.scroll + HEIGHT: continue
+            if y + VSTEP < self.scroll: continue
+            self.Canvas.create_text(x,y-self.scroll,text=c)
 
-    def load(self,url):
-        body = url.request()
-        show(body)
-        self.Canvas.create_rectangle(10,20,400,300)
-        self.Canvas.create_oval(100,100,150,150)
-        self.Canvas.create_text(200,150, text="Hola")
+    def scrolldown(self,e):
+        self.scroll += SCROLL_STEP
+        self.draw()
 
-
-
-def show(body):
+def lex(body):
+    out = []
+    buffer = ""
     in_tag = False
     for c in body:
         if c == "<":
             in_tag = True
+            if buffer: out.append(Text(buffer))
+            buffer = ""
         elif c == ">":
             in_tag = False
-        elif not in_tag:
-            print(c, end="")
+            out.append(Tag(buffer))
+            buffer = ""
+        else:
+            buffer +=c
+    if not in_tag and buffer:
+        out.append(Text(buffer))
+    return out
