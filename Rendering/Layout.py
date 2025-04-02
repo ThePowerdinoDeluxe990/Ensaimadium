@@ -16,11 +16,13 @@ def get_font(size,weight,style):
 class Layout:
     def __init__(self, tree):
         self.display_list = []
+        
         self.cursor_x = HSTEP
         self.cursor_y = VSTEP
         self.size = 12
         self.weight = "normal"
         self.style = "roman"
+
         self.line = []
         self.recurse(tree)
         self.flush()
@@ -30,7 +32,7 @@ class Layout:
         if tag == "i":
             self.style = "italic"
         elif tag == "b":
-            self.style = "bold"
+            self.weight = "bold"
         elif tag == "small":
             self.size -= 2
         elif tag == "big":
@@ -51,32 +53,6 @@ class Layout:
             self.flush()
             self.cursor_y += VSTEP
 
-    def token(self,tok):
-        if isinstance(tok, Text):
-            for word in tok.text.split():
-                self.word(word)
-        elif tok.tag == "i":
-            self.style = "italic"
-        elif tok.tag == "/i":
-            self.style = "roman"
-        elif tok.tag == "b":
-            self.weight = "bold"
-        elif tok.tag == "/b":
-            self.weight = "normal"
-        elif tok.tag == "small":
-            self.size -=2
-        elif tok.tag == "/small":
-            self.size +=2
-        elif tok.tag == "big":
-            self.size +=4
-        elif tok.tag == "/big":
-            self.size -=4
-        elif tok.tag == "br":
-            self.flush()
-        elif tok.tag == "/p":
-            self.flush()
-            self.cursor_y += VSTEP
-
 
     def flush(self):
         if not self.line: return
@@ -94,7 +70,6 @@ class Layout:
     def word(self, word):
         font = get_font(self.size, self.weight, self.style)
         w = font.measure(word)
-
         if self.cursor_x + w > WIDTH - HSTEP:
             self.flush()
         self.line.append((self.cursor_x,word, font))

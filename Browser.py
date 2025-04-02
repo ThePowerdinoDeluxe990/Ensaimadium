@@ -17,26 +17,29 @@ class Browser:
         self.draw()
 
     def __init__(self):
-        self.display_list = []
         self.window = tkinter.Tk()
-        self.Canvas = tkinter.Canvas(
+        self.canvas = tkinter.Canvas(
             self.window,
             width = WIDTH,
             height = HEIGHT,
         )
-        self.Canvas.pack()
+        self.canvas.pack()
         self.scroll = 0
         self.window.bind("<Down>", self.scrolldown)
+        self.window.bind("<Up>", self.scrollup)
+        self.display_list = []
 
     def draw(self):
-        self.Canvas.delete("all")
-
+        self.canvas.delete("all")
         for x,y,word,font in self.display_list:
             if y > self.scroll + HEIGHT: continue
-            if y + VSTEP < self.scroll: continue
-            self.Canvas.create_text(x,y-self.scroll,text=word, font = font, anchor="nw")
+            if y + font.metrics("linespace") < self.scroll: continue
+            self.canvas.create_text(x,y-self.scroll,text=word, font = font, anchor="nw")
 
     def scrolldown(self,e):
         self.scroll += SCROLL_STEP
         self.draw()
 
+    def scrollup(self,e):
+        self.scroll -= SCROLL_STEP
+        self.draw()

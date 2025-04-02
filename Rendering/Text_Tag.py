@@ -1,10 +1,9 @@
-
-
 class Text:
     def __init__(self, text, parent):
         self.text = text
         self.children = []
         self.parent = parent
+
     def __repr__(self):
         return repr(self.text)
 
@@ -14,6 +13,7 @@ class Element:
         self.attributes = attributes
         self.children = []
         self.parent = parent
+
     def __repr__(self):
         attrs = [" " + k + "=\"" + v + "\"" for k, v in self.attributes.items()]
         attr_str = ""
@@ -50,6 +50,7 @@ class HTMLParser:
                 self.add_tag("/head")
             else:
                 break
+
     def get_attributes(self,text):
         parts = text.split()
         tag = parts[0].casefold()
@@ -57,7 +58,7 @@ class HTMLParser:
         for attrpair in parts[1:]:
             if "=" in attrpair:
                 key,value = attrpair.split("=",1)
-                if len(value)>2and value[0] in ["'","\""]:
+                if len(value)>2 and value[0] in ["'","\""]:
                     value = value[1:-1]
                 attributes[key.casefold()] = value
             else:
