@@ -6,6 +6,6 @@ if __name__ == "__main__":
     # body = URL(sys.argv[1]).request()
     # nodes = HTMLParser(body).parse()
     # print_tree(nodes)
-    Browser().load(URL("http://bettermotherfuckingwebsite.com/"))
+    Browser().load(URL("https://perfectmotherfuckingwebsite.com/"))
 
     tkinter.mainloop()

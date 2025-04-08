@@ -5,7 +5,6 @@ from tkinter.simpledialog import askstring
 
 if __name__ == "__main__":
     url = askstring("Url","Pon la url de la pagina que quieras visitar WIP")
-
     #body = URL(sys.argv[1]).request()
     #nodes = HTMLParser(body).parse()
     #print_tree(nodes)
