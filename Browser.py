@@ -1,6 +1,5 @@
 import tkinter
 import tkinter.font
-
 from Rendering.DocumentLayout import DocumentLayout
 from Rendering.paint_functions import paint_tree
 
@@ -12,13 +11,17 @@ from Rendering.Text_Tag import HTMLParser
 
 class Browser:
     def load(self, url):
-        body = url.request()
+        try:
+            body = url.request()
+        except:
+            body = "<Big><b>Blank Page</b></Big>"
         self.nodes = HTMLParser(body).parse()
         self.document = DocumentLayout(self.nodes)
         self.document.layout()
         self.display_list = []
         paint_tree(self.document, self.display_list)
         self.draw()
+
 
     def __init__(self):
         self.nodes = None
