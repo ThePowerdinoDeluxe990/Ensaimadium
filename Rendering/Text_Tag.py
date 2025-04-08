@@ -40,7 +40,7 @@ class HTMLParser:
             if open_tags == [] and tag != "html":
                 self.add_tag("html")
             elif open_tags == ["html"] \
-                    and tag not in ["head", "body", "/html"]:
+                 and tag not in ["head", "body", "/html"]:
                 if tag in self.HEAD_TAGS:
                     self.add_tag("head")
                 else:
@@ -63,7 +63,7 @@ class HTMLParser:
                 attributes[key.casefold()] = value
             else:
                 attributes[attrpair.casefold()] = ""
-        return tag,attributes
+        return tag, attributes
 
     def add_tag(self,tag):
         tag,attributes = self.get_attributes(tag)
