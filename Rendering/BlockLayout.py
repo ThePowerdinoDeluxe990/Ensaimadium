@@ -39,10 +39,21 @@ class BlockLayout:
 
     def paint(self):
         cmds = []
+
+        #Al genio que hizo este lenguaje se le ocurrió la maravillosa idea de no meter multiline comments
+        """
         if isinstance(self.node, Element) and self.node.tag == "pre":
             x2,y2 = self.x + self.width, self.y + self.height
             rect = DrawRect(self.x,self.y,x2,y2, "gray")
             cmds.append(rect)
+        """
+        bgcolor = self.node.style.get("background-color","transparent")
+
+        if bgcolor != "transparent":
+            x2, y2 = self.x + self.width, self.y + self.height
+            rect = DrawRect(self.x, self.y, x2, y2, bgcolor)
+            cmds.append(rect)
+
 
         if self.layout_mode() == "inline":
             for x, y, word, font in self.display_list:

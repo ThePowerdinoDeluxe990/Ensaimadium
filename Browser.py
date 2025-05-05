@@ -1,13 +1,16 @@
 import tkinter
 import tkinter.font
 from Rendering.DocumentLayout import DocumentLayout
-from Rendering.paint_functions import paint_tree
+from Rendering.css.CSSParser import CSSParser, style
+from Rendering.paint_functions import paint_tree, cascade_priority
 
 WIDTH, HEIGHT = 800,600
 
 HSTEP, VSTEP = 13, 18
 SCROLL_STEP = 100
-from Rendering.Text_Tag import HTMLParser
+from Rendering.Text_Tag import HTMLParser, Element
+
+DEFAULT_STYLE_SHEET = CSSParser(open("browser.css").read()).parse()
 
 class Browser:
     def load(self, url):
@@ -19,8 +22,24 @@ class Browser:
         self.document = DocumentLayout(self.nodes)
         self.document.layout()
         self.display_list = []
+        links = [node.attributes["href"]
+                for node in tree_to_list(self.nodes, [])
+                if isinstance(node, Element)
+                and node.tag == "link"
+                and node.attributes.get("rel") == "stylesheet"
+                and "href" in node.attributes]
+        
         paint_tree(self.document, self.display_list)
+        rules = DEFAULT_STYLE_SHEET.copy()
+        style(self.nodes,sorted(rules, key =cascade_priority))
         self.draw()
+        for link in links:
+            style_url = url.resolve(link)
+            try:
+                body = style_url.request()
+            except:
+                continue
+            rules.extend(CSSParser(body).parse())
 
 
     def __init__(self):
@@ -54,3 +73,9 @@ class Browser:
         min_y = min(self.document.height - 2 / VSTEP + HEIGHT, 0)
         self.scroll = max(self.scroll - SCROLL_STEP, min_y)
         self.draw()
+
+def tree_to_list(tree,list):
+    list.append(tree)
+    for child in tree.children:
+        tree_to_list(child,list)
+    return list
