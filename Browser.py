@@ -45,11 +45,12 @@ class Browser:
     def __init__(self):
         self.nodes = None
         self.document = None
-        self.window = tkinter.Tk()
+        self.window = tkinter.Tk("Ensaimadium")
         self.canvas = tkinter.Canvas(
             self.window,
             width = WIDTH,
             height = HEIGHT,
+            bg = "white",
         )
         self.canvas.pack()
         self.scroll = 0

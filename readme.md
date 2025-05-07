@@ -2,6 +2,7 @@
 
 ## Description
 A simple prototype of a web browser built with python following https://browser.engineering/
+(This browser doesn't use Chromium btw)
 ## Getting Started
 ### Dependencies
 * Python 3
