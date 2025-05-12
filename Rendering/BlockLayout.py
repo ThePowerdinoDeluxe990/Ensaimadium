@@ -115,7 +115,6 @@ class BlockLayout:
             x = self.x + rel_x
             y = self.y + baseline - font.metrics("ascent")
             self.display_list.append((x,y,word,font,color))
-
         self.cursor_x = 0
         self.line = []
         max_descent = max([metric["descent"] for metric in metrics])
@@ -131,7 +130,7 @@ class BlockLayout:
         w = font.measure(word)
         if self.cursor_x + w > self.width:
             self.flush()
-        color = node.style["style"]
+        color = node.style["color"]
         self.line.append((self.cursor_x,word, font, color))
         self.cursor_x += w + font.measure(" ")
 

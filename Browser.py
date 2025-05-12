@@ -35,7 +35,6 @@ class Browser:
             except:
                 continue
             rules.extend(CSSParser(body).parse())
-
         style(self.nodes,sorted(rules, key =cascade_priority))
 
         self.document = DocumentLayout(self.nodes)
@@ -46,9 +45,7 @@ class Browser:
 
 
     def __init__(self):
-        self.nodes = None
-        self.document = None
-        self.window = tkinter.Tk("Ensaimadium")
+        self.window = tkinter.Tk()
         self.canvas = tkinter.Canvas(
             self.window,
             width = WIDTH,

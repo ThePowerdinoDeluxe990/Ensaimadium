@@ -39,7 +39,7 @@ class CSSParser:
         while self.i < len(self.s) and self.s[self.i] != "{":
             tag = self.word()
             descendant = TagSelector(tag.casefold())
-            out = DescendantSelector(out,descendant)
+            out = DescendantSelector(out, descendant)
             self.whitespace()
         return out
 
