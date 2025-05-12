@@ -6,7 +6,8 @@ from Rendering.Draw.Draw import DrawText, DrawRect
 FONTS = {}
 WIDTH, HEIGHT = 800, 600
 HSTEP, VSTEP = 13, 18
-from Rendering.Text_Tag import Text, Element
+from Rendering.Text_Tag import Element, Text
+
 BLOCK_ELEMENTS = [
     "html", "body", "article", "section", "nav", "aside",
     "h1", "h2", "h3", "h4", "h5", "h6", "hgroup", "header",
@@ -61,7 +62,7 @@ class BlockLayout:
         return cmds
 
     def layout_mode(self):
-        if isinstance(self.node,Text):
+        if isinstance(self.node, tkinter.Text):
             return "inline"
         elif any([isinstance(child,Element) and \
                   child.tag in BLOCK_ELEMENTS
@@ -114,24 +115,23 @@ class BlockLayout:
             x = self.x + rel_x
             y = self.y + baseline - font.metrics("ascent")
             self.display_list.append((x,y,word,font,color))
-        max_descent = max([metric["descent"] for metric in metrics])
-        self.cursor_y = baseline+1.25*max_descent
+
         self.cursor_x = 0
         self.line = []
+        max_descent = max([metric["descent"] for metric in metrics])
+        self.cursor_y = baseline+1.25*max_descent
 
-    def word(self,node, word):
-        color = node.style["style"]
-        font = get_font(self.size, self.weight, self.style)
+    def word(self, node, word):
         weight = node.style["font-weight"]
         style = node.style["font-style"]
         if style=="normal": style="roman"
         size = int(float(node.style["font-size"][:-2])*.75)
         font = get_font(size,weight,style)
-        #MIRA BIEN COMO FUNCIONE LO PRIMERO QUE VOY A BORRAR VA A SER A TI AMIGO
-        # font = get_font(self.size, self.weight, self.style)
+
         w = font.measure(word)
         if self.cursor_x + w > self.width:
             self.flush()
+        color = node.style["style"]
         self.line.append((self.cursor_x,word, font, color))
         self.cursor_x += w + font.measure(" ")
 

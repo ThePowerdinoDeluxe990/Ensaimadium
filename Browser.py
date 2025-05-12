@@ -19,20 +19,15 @@ class Browser:
         except:
             body = "<Big><b>Blank Page</b></Big>"
         self.nodes = HTMLParser(body).parse()
-        self.document = DocumentLayout(self.nodes)
-        self.document.layout()
-        self.display_list = []
-        links = [node.attributes["href"]
-                for node in tree_to_list(self.nodes, [])
-                if isinstance(node, Element)
-                and node.tag == "link"
-                and node.attributes.get("rel") == "stylesheet"
-                and "href" in node.attributes]
-        
-        paint_tree(self.document, self.display_list)
+
         rules = DEFAULT_STYLE_SHEET.copy()
-        style(self.nodes,sorted(rules, key =cascade_priority))
-        self.draw()
+        links = [node.attributes["href"]
+                 for node in tree_to_list(self.nodes, [])
+                 if isinstance(node, Element)
+                 and node.tag == "link"
+                 and node.attributes.get("rel") == "stylesheet"
+                 and "href" in node.attributes]
+
         for link in links:
             style_url = url.resolve(link)
             try:
@@ -40,6 +35,14 @@ class Browser:
             except:
                 continue
             rules.extend(CSSParser(body).parse())
+
+        style(self.nodes,sorted(rules, key =cascade_priority))
+
+        self.document = DocumentLayout(self.nodes)
+        self.document.layout()
+        self.display_list = []
+        paint_tree(self.document, self.display_list)
+        self.draw()
 
 
     def __init__(self):
