@@ -13,25 +13,59 @@ class CSSParser:
         self.s = s
         self.i = 0
 
-    def parse(self):
-        rules =[]
+    def whitespace(self):
+        while self.i < len(self.s) and self.s[self.i].isspace():
+            self.i += 1
+
+    def literal(self, literal):
+        if not (self.i < len(self.s) and self.s[self.i] == literal):
+            raise Exception("Parsing error")
+        self.i += 1
+
+    def word(self):
+        start = self.i
         while self.i < len(self.s):
+            if self.s[self.i].isalnum() or self.s[self.i] in "#-.%":
+                self.i += 1
+            else:
+                break
+        if not (self.i > start):
+            raise Exception("Parsing error")
+        return self.s[start:self.i]
+
+    def pair(self):
+        prop = self.word()
+        self.whitespace()
+        self.literal(":")
+        self.whitespace()
+        val = self.word()
+        return prop.casefold(), val
+
+    def ignore_until(self, chars):
+        while self.i < len(self.s):
+            if self.s[self.i] in chars:
+                return self.s[self.i]
+            else:
+                self.i += 1
+        return None
+
+    def body(self):
+        pairs = {}
+        while self.i < len(self.s) and self.s[self.i] != "}":
             try:
+                prop, val = self.pair()
+                pairs[prop.casefold()] = val
                 self.whitespace()
-                selector = self.selector()
-                self.literal("{")
+                self.literal(";")
                 self.whitespace()
-                body = self.body()
-                self.literal("}")
-                rules.append((selector,body))
             except Exception:
-                why = self.ignore_until(["}"])
-                if why == "}":
-                    self.literal("}")
+                why = self.ignore_until([";", "}"])
+                if why == ";":
+                    self.literal(";")
                     self.whitespace()
                 else:
                     break
-        return rules
+        return pairs
 
     def selector(self):
         out = TagSelector(self.word().casefold())
@@ -43,59 +77,26 @@ class CSSParser:
             self.whitespace()
         return out
 
-    def whitespace(self):
-        while self.i < len(self.s) and self.s[self.i].isspace():
-            self.i += 1
-
-    def word(self):
-        start = self.i
+    def parse(self):
+        rules = []
         while self.i < len(self.s):
-            if self.s[self.i].isalumn() or self.s[self.i] in "#-.%":
-                self.i += 1
-            else:
-                break
-        if not (self.i > start):
-            raise Exception("Parsing Error")
-        return self.s[start:self.i]
-
-    def literal(self, literal):
-        if not (self.i < len(self.s) and self.s[self.i] == literal):
-            raise Exception("Parsing error")
-        self.i += 1
-
-    def pair(self):
-        prop = self.word()
-        self.whitespace()
-        self.literal(":")
-        self.whitespace()
-        val = self.word()
-        return prop.casefold(), val
-
-    def body(self):
-        pairs = {}
-        while self.i < len(self.s) and self.s[self.i] != "}":
             try:
-                prop,val = self.pair()
-                pairs[prop.casefold()] = val
                 self.whitespace()
-                self.literal(";")
+                selector = self.selector()
+                self.literal("{")
                 self.whitespace()
+                body = self.body()
+                self.literal("}")
+                rules.append((selector, body))
             except Exception:
-                why = self.ignore_until([";","}"])
-                if why == ";":
-                    self.literal(";")
+                why = self.ignore_until(["}"])
+                if why == "}":
+                    self.literal("}")
                     self.whitespace()
                 else:
                     break
-        return pairs
+        return rules
 
-    def ignore_until(self,chars):
-        while self.i < len(self.s):
-            if self.s[self.i] in chars:
-                return self.s[self.i]
-            else:
-                self.i +=1
-        return None
 
 def style(node, rules):
     node.style = {}
