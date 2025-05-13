@@ -46,6 +46,8 @@ class Browser:
 
     def __init__(self):
         self.window = tkinter.Tk()
+        self.window.title("Ensaïmadium")
+        self.window.iconbitmap("./ensaimadium.ico")
         self.canvas = tkinter.Canvas(
             self.window,
             width = WIDTH,

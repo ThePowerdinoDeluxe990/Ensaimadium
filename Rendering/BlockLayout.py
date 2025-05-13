@@ -124,7 +124,10 @@ class BlockLayout:
         weight = node.style["font-weight"]
         style = node.style["font-style"]
         if style=="normal": style="roman"
-        size = int(float(node.style["font-size"][:-2])*.75)
+        try:
+            size = int(float(node.style["font-size"][:-2])*.75)
+        except:
+            size = 1
         font = get_font(size,weight,style)
 
         w = font.measure(word)
