@@ -1,7 +1,8 @@
 import tkinter.font
 import tkinter
 
-from Rendering.Draw.Draw import DrawText, DrawRect
+from Rendering.Layout.LineLayout import LineLayout
+from Rendering.Layout.TextLayout import TextLayout
 
 FONTS = {}
 WIDTH, HEIGHT = 800, 600
@@ -37,29 +38,12 @@ class BlockLayout:
         self.width = None
         self.height= None
 
+    def new_line(self):
+        self.cursor_x = 0
+        last_line = self.children[-1] if self.children else None
+        new_line = LineLayout(self.node, self, last_line)
+        self.children.append(new_line)
 
-    def paint(self):
-        cmds = []
-
-        #Al genio que hizo este lenguaje se le ocurrió la maravillosa idea de no meter multiline comments
-        """
-        if isinstance(self.node, Element) and self.node.tag == "pre":
-            x2,y2 = self.x + self.width, self.y + self.height
-            rect = DrawRect(self.x,self.y,x2,y2, "gray")
-            cmds.append(rect)
-        """
-        bgcolor = self.node.style.get("background-color","transparent")
-
-        if bgcolor != "transparent":
-            x2, y2 = self.x + self.width, self.y + self.height
-            rect = DrawRect(self.x, self.y, x2, y2, bgcolor)
-            cmds.append(rect)
-
-
-        if self.layout_mode() == "inline":
-            for x, y, word, font,color in self.display_list:
-                cmds.append(DrawText(x,y,word,font,color))
-        return cmds
 
     def layout_mode(self):
         if isinstance(self.node, tkinter.Text):
@@ -124,10 +108,7 @@ class BlockLayout:
         weight = node.style["font-weight"]
         style = node.style["font-style"]
         if style=="normal": style="roman"
-        try:
-            size = int(float(node.style["font-size"][:-2])*.75)
-        except:
-            size = 1
+        size = int(float(node.style["font-size"][:-2])*.75)
         font = get_font(size,weight,style)
 
         w = font.measure(word)
@@ -136,6 +117,13 @@ class BlockLayout:
         color = node.style["color"]
         self.line.append((self.cursor_x,word, font, color))
         self.cursor_x += w + font.measure(" ")
+
+        line = self.children[-1]
+        previous_word = line.children[-1] if line.children else None
+        text = TextLayout(node,word,line,previous_word)
+        line.children.append(text)
+        if self.cursor_x + w > self.width:
+            self.new_line()
 
     def layout(self):
         self.x = self.parent.x
@@ -171,7 +159,8 @@ class BlockLayout:
             self.height = sum([
                 child.height for child in self.children])
         else:
-            self.height = self.cursor_y
+            self.new_line()
+            self.recurse(self.node)
 
     def recurse(self, node):
         if isinstance(node, Text):

@@ -7,6 +7,7 @@ INHERITED_PROPERTIES = {
     "font-weight": "normal",
     "color": "black",
 }
+# SUSSY PUSSY ROSE MI AMADA
 
 class CSSParser:
     def __init__(self, s):

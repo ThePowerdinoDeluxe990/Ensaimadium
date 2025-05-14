@@ -1,6 +1,6 @@
 import tkinter
 import tkinter.font
-from Rendering.DocumentLayout import DocumentLayout
+from Rendering.Layout.DocumentLayout import DocumentLayout
 from Rendering.css.CSSParser import CSSParser, style
 from Rendering.paint_functions import paint_tree, cascade_priority
 

@@ -1,4 +1,4 @@
-from Rendering.BlockLayout import BlockLayout
+from Rendering.Layout.BlockLayout import BlockLayout
 WIDTH, HEIGHT = 800, 600
 HSTEP, VSTEP = 13, 18
 
