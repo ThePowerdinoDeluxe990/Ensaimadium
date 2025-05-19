@@ -6,7 +6,7 @@ from tkinter.simpledialog import askstring
 
 if __name__ == "__main__":
     url = askstring("Ensaïmadium","Pon la url de la pagina que quieras visitar WIP")
-    Browser().load(URL(url))
+    Browser().new_tab(URL(url))
     tkinter.mainloop()
     #body = URL(sys.argv[1]).request()
     #nodes = HTMLParser(body).parse()

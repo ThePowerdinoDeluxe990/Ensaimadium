@@ -1,5 +1,7 @@
 import tkinter
 import tkinter.font
+
+from Browser.Tab import Tab
 from Rendering.Layout.DocumentLayout import DocumentLayout
 from Rendering.css.CSSParser import CSSParser, style
 from Rendering.paint_functions import paint_tree, cascade_priority
@@ -8,12 +10,13 @@ WIDTH, HEIGHT = 800,600
 
 HSTEP, VSTEP = 13, 18
 SCROLL_STEP = 100
-from Rendering.Text_Tag import HTMLParser, Element
+from Rendering.Text_Tag import HTMLParser, Element, Text
 
-DEFAULT_STYLE_SHEET = CSSParser(open("browser.css").read()).parse()
+DEFAULT_STYLE_SHEET = CSSParser(open("../browser.css").read()).parse()
 
 class Browser:
     def load(self, url):
+        self.url = url
         try:
             body = url.request()
         except:
@@ -43,36 +46,59 @@ class Browser:
         paint_tree(self.document, self.display_list)
         self.draw()
 
+    def click(self,x,y):
+        x,y = x,y
+        y += self.scroll
+        objs = [obj for obj in tree_to_list(self.document, [])
+                if obj.x <= x < obj.x + obj.width
+                and obj.y <= y < obj.y + obj.height]
+        if not objs: return
+        elt = objs[-1].node
+
+        while elt:
+            if isinstance(elt,Text):
+                pass
+            elif elt.tag == "a" and "href" in elt.attributes:
+                url = self.url.resolve(elt.attributes["href"])
+                return self.load(url)
+            elt = elt.parent
 
     def __init__(self):
-        self.window = tkinter.Tk()
-        self.window.title("Ensaïmadium")
-        self.window.iconbitmap("./ensaimadium.ico")
-        self.canvas = tkinter.Canvas(
-            self.window,
-            width = WIDTH,
-            height = HEIGHT,
-            bg = "white",
-        )
-        self.canvas.pack()
+        self.tabs = []
+        self.active_tab = None
         self.scroll = 0
-        self.window.bind("<Down>", self.scrolldown)
-        self.window.bind("<Up>", self.scrollup)
         self.display_list = []
+        self.url = None
+
+    def handle_down(self,e):
+        self.active_tab.scrolldown()
+        self.draw()
+
+    def handle_up(self,e):
+        self.active_tab.scrollup()
+        self.draw()
+
+    def handle_click(self,e):
+        self.active_tab.click(e.x,e.y)
+        self.draw()
+
+    def new_tab(self,url):
+        new_tab = Tab()
+        new_tab.load(url)
+        self.active_tab = new_tab
+        self.tabs.append(new_tab)
+        self.draw
 
     def draw(self):
         self.canvas.delete("all")
-        for cmd in self.display_list:
-            if cmd.top > self.scroll + HEIGHT: continue
-            if cmd.bottom < self.scroll:continue
-            cmd.execute(self.scroll, self.canvas)
+        self.active_tab.draw(self.canvas)
 
-    def scrolldown(self,e):
+    def scrolldown(self):
         max_y = max(self.document.height + 2 * VSTEP - HEIGHT, 0)
         self.scroll = min(self.scroll + SCROLL_STEP, max_y)
         self.draw()
 
-    def scrollup(self,e):
+    def scrollup(self):
         min_y = min(self.document.height - 2 / VSTEP + HEIGHT, 0)
         self.scroll = max(self.scroll - SCROLL_STEP, min_y)
         self.draw()
