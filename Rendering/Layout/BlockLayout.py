@@ -57,6 +57,10 @@ class BlockLayout:
         else:
             return "block"
 
+    def self_rect(self):
+        return Rect(self.x, self.y,
+                    self.x+ self.width, self.y + self.height)
+
     def layout_intermediate(self):
         previous = None
         for child in self.node.children:
@@ -89,45 +93,26 @@ class BlockLayout:
             self.flush()
             self.cursor_y += VSTEP
 
-
-    def flush(self):
-        if not self.line: return
-        metrics = [font.metrics() for x, word, font, color in self.line]
-        max_ascent = max([metric["ascent"] for metric in metrics])
-        baseline = self.cursor_y + 1.25 * max_ascent
-        for rel_x, word, font,color in self.line:
-            x = self.x + rel_x
-            y = self.y + baseline - font.metrics("ascent")
-            self.display_list.append((x,y,word,font,color))
-        self.cursor_x = 0
-        self.line = []
-        max_descent = max([metric["descent"] for metric in metrics])
-        self.cursor_y = baseline+1.25*max_descent
-
     def word(self, node, word):
         weight = node.style["font-weight"]
         style = node.style["font-style"]
-        if style=="normal": style="roman"
-        size = int(float(node.style["font-size"][:-2])*.75)
-        font = get_font(size,weight,style)
+        if style == "normal": style = "roman"
+        size = int(float(node.style["font-size"][:-2]) * .75)
+        font = get_font(size, weight, style)
 
         w = font.measure(word)
         if self.cursor_x + w > self.width:
-            self.flush()
-        color = node.style["color"]
-        self.line.append((self.cursor_x,word, font, color))
-        self.cursor_x += w + font.measure(" ")
-
+            self.new_line()
         line = self.children[-1]
         previous_word = line.children[-1] if line.children else None
-        text = TextLayout(node,word,line,previous_word)
+        text = TextLayout(node, word, line, previous_word)
         line.children.append(text)
-        if self.cursor_x + w > self.width:
-            self.new_line()
+        self.cursor_x += w + font.measure(" ")
 
     def layout(self):
-        self.x = self.parent.x
+
         self.width= self.parent.width
+        self.x = self.parent.x
 
         if self.previous:
             self.y= self.previous.y+self.previous.height
@@ -142,25 +127,13 @@ class BlockLayout:
                 self.children.append(next)
                 previous = next
         else:
-            self.cursor_x = 0
-            self.cursor_y = 0
-            self.weight = "normal"
-            self.style = "roman"
-            self.size = 12
-
-            self.line = []
+            self.new_line()
             self.recurse(self.node)
-            self.flush()
 
         for child in self.children:
             child.layout()
 
-        if mode == "block":
-            self.height = sum([
-                child.height for child in self.children])
-        else:
-            self.new_line()
-            self.recurse(self.node)
+        self.height = sum([child.height for child in self.children])
 
     def recurse(self, node):
         if isinstance(node, Text):
@@ -168,6 +141,15 @@ class BlockLayout:
                 self.word(node, word)
         else:
            if node.tag == "br":
-               self.flush()
+               self.new_line()
            for child in node.children:
                 self.recurse(child)
+
+    def paint(self):
+        cmds = []
+        bgcolor = self.node.style.get("background-color",
+                                      "transparent")
+        if bgcolor != "transparent":
+            rect = DrawRect(self.self_rect(), bgcolor)
+            cmds.append(rect)
+        return cmds

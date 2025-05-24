@@ -1,5 +1,5 @@
 import tkinter
-from Browser import Browser
+import Browser
 from Web_Connection.URL import URL
 
 if __name__ == "__main__":

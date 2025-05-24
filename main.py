@@ -1,12 +1,11 @@
 import tkinter
+
 from Browser import Browser
-from Rendering.css.CSSParser import CSSParser
 from Web_Connection.URL import URL
 from tkinter.simpledialog import askstring
 
 if __name__ == "__main__":
-    url = askstring("Ensaïmadium","Pon la url de la pagina que quieras visitar WIP")
-    Browser().new_tab(URL(url))
+    Browser().new_tab(URL("https://info.cern.ch/"))
     tkinter.mainloop()
     #body = URL(sys.argv[1]).request()
     #nodes = HTMLParser(body).parse()

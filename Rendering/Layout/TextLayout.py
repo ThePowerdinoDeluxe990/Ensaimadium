@@ -1,4 +1,14 @@
 from Rendering.Draw.Draw import DrawText
+FONTS = {}
+import tkinter
+
+def get_font(size, weight, style):
+    key = (size, weight, style)
+    if key not in FONTS:
+        font = tkinter.font.Font(size=size, weight=weight, slant=style)
+        label = tkinter.Label(font=font)
+        FONTS[key] = (font, label)
+    return FONTS[key][0]
 
 
 class TextLayout:
@@ -8,6 +18,7 @@ class TextLayout:
         self.parent = parent
         self.previous = previous
         self.children = []
+
 
     def layout(self):
         weight = self.node.style["font-weight"]
