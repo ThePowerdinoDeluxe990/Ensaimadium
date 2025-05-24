@@ -1,5 +1,4 @@
-from Chrome.Rect import Rect
-
+from userChrome.Rect import Rect
 
 class DrawLine:
     def __init__(self,x1,y1,x2,y2,color, thickness):

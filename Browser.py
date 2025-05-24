@@ -1,6 +1,6 @@
 import tkinter
 
-from Chrome.Chrome import Chrome
+from userChrome.Chrome import Chrome
 from Rendering.Layout.DocumentLayout import DocumentLayout
 from Rendering.css.CSSParser import CSSParser, style
 from Rendering.paint_functions import paint_tree, cascade_priority
@@ -14,8 +14,6 @@ from Rendering.Text_Tag import HTMLParser, Element, Text
 DEFAULT_STYLE_SHEET = CSSParser(open("browser.css").read()).parse()
 
 class Browser:
-
-
     def load(self, url):
         self.url = url
         try:
@@ -106,7 +104,7 @@ class Browser:
         self.draw()
 
     def new_tab(self,url):
-        from Chrome.Tab import Tab
+        from userChrome.Tab import Tab
         new_tab = Tab(HEIGHT - self.chrome.bottom)
         new_tab.load(url)
         self.active_tab = new_tab

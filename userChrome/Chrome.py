@@ -1,9 +1,9 @@
-from Chrome.Rect import Rect
 from Rendering.Draw.Draw import DrawText, DrawRect
 from Rendering.Draw.DrawLine import DrawLine
 from Rendering.Draw.DrawOutline import DrawOutline
 from Rendering.Layout.BlockLayout import get_font, WIDTH
 from Web_Connection.URL import URL
+from userChrome.Rect import Rect
 
 
 class Chrome:

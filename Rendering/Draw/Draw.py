@@ -1,4 +1,4 @@
-from Chrome.Rect import Rect
+from userChrome.Rect import Rect
 
 
 class DrawText:

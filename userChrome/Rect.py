@@ -6,5 +6,5 @@ class Rect:
         self.bottom = bottom
 
     def contains_point(self,x,y):
-        return x>= self.left and y < self.right \
+        return x >= self.left and x < self.right \
             and y >= self.top and y < self.bottom
