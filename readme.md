@@ -16,7 +16,7 @@ A simple prototype of a web browser built with python following https://browser.
 ### Building from source
 * Git Clone https://github.com/ThePowerdinoDeluxe990/Web_Browser.git
 * Run exe_script.py
-* Move browser.css to dist folder
+* Move browser.css and ensaimadium.ico to dist folder
 
 ## Autors
 ThePowerdinoDeluxe990
