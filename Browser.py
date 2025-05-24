@@ -68,8 +68,10 @@ class Browser:
             self.window,
             width=WIDTH,
             height=HEIGHT,
-            bg="white",
+            bg="white"
         )
+        self.window.title("Ensaimadium")
+        self.window.iconbitmap("ensaimadium.ico")
         self.canvas.pack()
         self.tabs = []
         self.active_tab = None
