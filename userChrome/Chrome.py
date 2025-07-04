@@ -45,6 +45,9 @@ class Chrome:
 
         self.bottom = self.urlbar_bottom
 
+    def blur(self):
+        self.focus = None
+
     def tab_rect(self,i):
         tabs_start = self.newtab_rect.right+self.padding
         tab_width = self.font.measure("Tab X") + 2*self.padding
@@ -139,6 +142,8 @@ class Chrome:
     def keypress(self, char):
         if self.focus == "address bar":
             self.address_bar += char
+            return True
+        return False
 
     def enter(self):
         if self.focus == "address bar":

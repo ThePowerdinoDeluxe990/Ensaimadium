@@ -9,7 +9,8 @@ WIDTH, HEIGHT = 800,600
 
 HSTEP, VSTEP = 13, 18
 SCROLL_STEP = 100
-from Rendering.Text_Tag import HTMLParser, Element, Text
+from Rendering.Text_Tag import Element, Text
+from Rendering.HTMLParser import HTMLParser
 
 DEFAULT_STYLE_SHEET = CSSParser(open("browser.css").read()).parse()
 
@@ -92,6 +93,11 @@ class Browser:
         if not (0x20 <= ord(e.char)< 0x7f): return
         self.chrome.keypress(e.char)
         self.draw()
+        if self.chrome.keypress(e.char):
+            self.draw()
+        elif self.focus == "content":
+            self.active_tab.keypress(e.char)
+            self.draw()
 
     def handle_down(self,e):
         self.active_tab.scrolldown()
@@ -122,8 +128,11 @@ class Browser:
 
     def handle_click(self,e):
         if e.y < self.chrome.bottom:
+            self.focus = None
             self.chrome.click(e.x,e.y)
         else:
+            self.focus = "content"
+            self.chrome.blur()
             tab_y = e.y - self.chrome.bottom
             self.active_tab.click(e.x,tab_y)
         self.draw()

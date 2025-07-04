@@ -1,6 +1,9 @@
+import urllib.parse
+
 from Browser import tree_to_list, VSTEP, SCROLL_STEP
 from Rendering.Layout.DocumentLayout import DocumentLayout
-from Rendering.Text_Tag import Element, HTMLParser, Text
+from Rendering.Text_Tag import Element, Text
+from Rendering.HTMLParser import HTMLParser
 from Rendering.css.CSSParser import style, CSSParser
 from Rendering.paint_functions import paint_tree, cascade_priority
 
@@ -11,6 +14,8 @@ class Tab:
         self.url = None
         self.history = []
         self.tab_height = tab_height
+        self.focus = None
+
 
     def draw(self, canvas, offset):
         for cmd in self.display_list:
@@ -19,8 +24,8 @@ class Tab:
             if cmd.rect.bottom < self.scroll: continue
             cmd.execute(self.scroll - offset, canvas)
 
-    def load(self,url):
-        body = url.request()
+    def load(self,url, payload=None):
+        body = url.request(payload)
         self.scroll = 0
         self.url = url
         self.history.append(url)
@@ -44,7 +49,14 @@ class Tab:
         self.document.layout()
         self.display_list = []
         paint_tree(self.document, self.display_list)
+        self.render()
 
+    def render(self):
+        style(self.nodes, sorted(self.rules, key=cascade_priority))
+        self.document = DocumentLayout(self.nodes)
+        self.document.layout()
+        self.display_list = []
+        paint_tree(self.document, self.display_list)
 
     def go_back(self):
         if len(self.history) > 1:
@@ -56,6 +68,10 @@ class Tab:
         min_y = min(self.document.height - 2 / VSTEP + self.tab_height, 0)
         self.scroll = max(self.scroll - SCROLL_STEP, min_y)
 
+    def keypress(self, char):
+        if self.focus:
+            self.focus.attributes["values"] += char
+            self.render()
 
     def scrolldown(self):
         max_y = max(
@@ -63,16 +79,47 @@ class Tab:
         self.scroll = min(self.scroll + SCROLL_STEP, max_y)
 
     def click(self, x, y):
+        self.focus = None
         y += self.scroll
         objs = [obj for obj in tree_to_list(self.document, [])
                 if obj.x <= x < obj.x + obj.width
                 and obj.y <= y < obj.y + obj.height]
         if not objs: return
         elt = objs[-1].node
+        if self.focus:
+            self.focus.is_focused = False
         while elt:
             if isinstance(elt, Text):
                 pass
             elif elt.tag == "a" and "href" in elt.attributes:
                 url = self.url.resolve(elt.attributes["href"])
                 return self.load(url)
+            elif elt.tag == "input":
+                elt.attributes["value"] = ""
+                self.focus = elt
+                elt.is_focused = True
+                return self.render()
+            elif elt.tag == "button":
+                while elt:
+                    if elt.tag == "form" and "action" in elt.attributes:
+                        return self.submit_form("elt")
+                    elt = elt.parent
             elt = elt.parent
+
+        self.render()
+
+    def submit_form(self, elt):
+        inputs = [node for node in tree_to_list(elt, [])
+                  if isinstance(node, Element)
+                  and node.tag == "input"
+                  and "name" in node.attributes]
+        body = ""
+        for input in inputs:
+            name = input.attributes["name"]
+            value = input.attributes.get("value", "")
+            name = urllib.parse.quote(name)
+            value = urllib.parse.quote(value)
+            body += "&" + name + "=" + value
+        body = body[1:]
+        url = self.url.resolve(elt.attributes["action"])
+        self.load(url, body)

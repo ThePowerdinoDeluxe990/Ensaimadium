@@ -1,9 +1,13 @@
 import tkinter.font
 import tkinter
 
+from Rendering.Draw.Draw import DrawRect
+from Rendering.Layout.InputLayout import InputLayout
 from Rendering.Layout.LineLayout import LineLayout
 from Rendering.Layout.TextLayout import TextLayout
+from userChrome.Rect import Rect
 
+INPUT_WIDTH_PX = 200
 FONTS = {}
 WIDTH, HEIGHT = 800, 600
 HSTEP, VSTEP = 13, 18
@@ -52,7 +56,7 @@ class BlockLayout:
                   child.tag in BLOCK_ELEMENTS
                   for child in self.node.children]):
             return "block"
-        elif self.node.children:
+        elif self.node.children or self.node.tag == "input":
             return "inline"
         else:
             return "block"
@@ -142,8 +146,28 @@ class BlockLayout:
         else:
            if node.tag == "br":
                self.new_line()
-           for child in node.children:
-                self.recurse(child)
+           elif node.tag == "input" or node.tag == "button":
+               self.input(node)
+           else:
+               for child in node.children:
+                   self.recurse(child)
+
+    def input(self, node):
+        w = INPUT_WIDTH_PX
+        if self.cursor_x + w > self.width:
+            self.new_line()
+        line = self.children[-1]
+        previous_word = line.children[-1] if line.children else None
+        input = InputLayout(node, line, previous_word)
+        line.children.append(input)
+
+        weight = node.style["font-weight"]
+        style = node.style["font-style"]
+        if style == "normal": style = "roman"
+        size = int(float(node.style["font-size"][:-2]) * .75)
+        font = get_font(size, weight, style)
+
+        self.cursor_x += w + font.measure(" ")
 
     def paint(self):
         cmds = []
@@ -153,3 +177,7 @@ class BlockLayout:
             rect = DrawRect(self.self_rect(), bgcolor)
             cmds.append(rect)
         return cmds
+
+    def should_paint(self):
+        return isinstance(self.node, Text) or \
+            (self.node.tag != "input" and self.node.tag != "button")
