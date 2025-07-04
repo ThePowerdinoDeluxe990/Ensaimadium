@@ -25,13 +25,13 @@ class Tab:
             cmd.execute(self.scroll - offset, canvas)
 
     def load(self,url, payload=None):
-        body = url.request(payload)
         self.scroll = 0
         self.url = url
         self.history.append(url)
+        body = url.request(payload)
         self.nodes = HTMLParser(body).parse()
 
-        rules = DEFAULT_STYLE_SHEET.copy()
+        self.rules = DEFAULT_STYLE_SHEET.copy()
         links = [node.attributes["href"]
                  for node in tree_to_list(self.nodes, [])
                  if isinstance(node, Element)
@@ -43,12 +43,7 @@ class Tab:
                 body = url.resolve(link).request()
             except:
                 continue
-        style(self.nodes, sorted(rules, key=cascade_priority))
-
-        self.document = DocumentLayout(self.nodes)
-        self.document.layout()
-        self.display_list = []
-        paint_tree(self.document, self.display_list)
+            self.rules.extend(CSSParser(body).parse())
         self.render()
 
     def render(self):
@@ -79,15 +74,16 @@ class Tab:
         self.scroll = min(self.scroll + SCROLL_STEP, max_y)
 
     def click(self, x, y):
+
+        if self.focus:
+            self.focus.is_focused = False
         self.focus = None
         y += self.scroll
         objs = [obj for obj in tree_to_list(self.document, [])
                 if obj.x <= x < obj.x + obj.width
                 and obj.y <= y < obj.y + obj.height]
-        if not objs: return
+        if not objs: return self.render()
         elt = objs[-1].node
-        if self.focus:
-            self.focus.is_focused = False
         while elt:
             if isinstance(elt, Text):
                 pass
@@ -102,11 +98,11 @@ class Tab:
             elif elt.tag == "button":
                 while elt:
                     if elt.tag == "form" and "action" in elt.attributes:
-                        return self.submit_form("elt")
+                        return self.submit_form(elt)
                     elt = elt.parent
             elt = elt.parent
-
         self.render()
+
 
     def submit_form(self, elt):
         inputs = [node for node in tree_to_list(elt, [])

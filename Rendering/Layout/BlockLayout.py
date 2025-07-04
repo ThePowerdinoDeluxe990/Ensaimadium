@@ -50,7 +50,7 @@ class BlockLayout:
 
 
     def layout_mode(self):
-        if isinstance(self.node, tkinter.Text):
+        if isinstance(self.node, Text):
             return "inline"
         elif any([isinstance(child,Element) and \
                   child.tag in BLOCK_ELEMENTS
@@ -174,8 +174,8 @@ class BlockLayout:
         bgcolor = self.node.style.get("background-color",
                                       "transparent")
         if bgcolor != "transparent":
-            rect = DrawRect(self.self_rect(), bgcolor)
-            cmds.append(rect)
+            draw_rect = DrawRect(self.self_rect(), bgcolor)
+            cmds.append(draw_rect)
         return cmds
 
     def should_paint(self):

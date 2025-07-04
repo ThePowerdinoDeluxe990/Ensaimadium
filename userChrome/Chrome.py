@@ -120,8 +120,6 @@ class Chrome:
         return cmds
 
 
-
-
     def click(self,x,y):
         self.focus = None
         if self.newtab_rect.contains_point(x,y):

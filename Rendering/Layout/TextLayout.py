@@ -15,9 +15,14 @@ class TextLayout:
     def __init__(self,node,word, parent, previous):
         self.node = node
         self.word = word
+        self.children = []
         self.parent = parent
         self.previous = previous
-        self.children = []
+        self.x = None
+        self.y = None
+        self.width = None
+        self.height = None
+        self.font = None
 
 
     def layout(self):
@@ -40,3 +45,6 @@ class TextLayout:
     def paint(self):
         color = self.node.style["color"]
         return [DrawText(self.x, self.y, self.word, self.font, color)]
+
+    def should_paint(self):
+        return True

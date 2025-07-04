@@ -12,6 +12,9 @@ class DocumentLayout:
     def paint(self):
         return []
 
+    def should_paint(self):
+        return True
+
     def layout(self):
         child = BlockLayout(self.node, self, None)
         self.children.append(child)
