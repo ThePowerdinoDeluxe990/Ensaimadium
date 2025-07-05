@@ -1,3 +1,4 @@
+
 from Rendering.Draw.Draw import DrawText, DrawRect
 from Rendering.Draw.DrawLine import DrawLine
 from Rendering.Draw.DrawOutline import DrawOutline
@@ -142,6 +143,7 @@ class Chrome:
             self.address_bar += char
             return True
         return False
+
 
     def enter(self):
         if self.focus == "address bar":
