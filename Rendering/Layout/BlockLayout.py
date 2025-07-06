@@ -169,6 +169,11 @@ class BlockLayout:
 
         self.cursor_x += w + font.measure(" ")
 
+
+    def should_paint(self):
+        return isinstance(self.node, Text) or \
+            (self.node.tag != "input" and self.node.tag != "button")
+
     def paint(self):
         cmds = []
         bgcolor = self.node.style.get("background-color",
@@ -177,7 +182,3 @@ class BlockLayout:
             draw_rect = DrawRect(self.self_rect(), bgcolor)
             cmds.append(draw_rect)
         return cmds
-
-    def should_paint(self):
-        return isinstance(self.node, Text) or \
-            (self.node.tag != "input" and self.node.tag != "button")

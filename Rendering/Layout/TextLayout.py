@@ -35,7 +35,7 @@ class TextLayout:
         self.width = self.font.measure(self.word)
 
         if self.previous:
-            space = self.previous.font.measure("")
+            space = self.previous.font.measure(" ")
             self.x = self.previous.x + space + self.previous.width
         else:
             self.x = self.parent.x

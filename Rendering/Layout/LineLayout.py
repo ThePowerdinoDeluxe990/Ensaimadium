@@ -1,6 +1,10 @@
 
 class LineLayout:
     def __init__(self,node,parent,previous):
+        self.height = None
+        self.x = None
+        self.y = None
+        self.width = None
         self.node = node
         self.parent = parent
         self.previous = previous
