@@ -1,11 +1,4 @@
-import tkinter
-import Browser
-from Web_Connection.URL import URL
+import dukpy
 
-if __name__ == "__main__":
-    # body = URL(sys.argv[1]).request()
-    # nodes = HTMLParser(body).parse()
-    # print_tree(nodes)
-    Browser().load(URL("https://perfectmotherfuckingwebsite.com/"))
+dukpy.evaljs("2+2")
 
-    tkinter.mainloop()

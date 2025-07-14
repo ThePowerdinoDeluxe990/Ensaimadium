@@ -1,5 +1,7 @@
 import urllib.parse
 
+import dukpy
+
 from Browser import tree_to_list, VSTEP, SCROLL_STEP
 from Rendering.Layout.DocumentLayout import DocumentLayout
 from Rendering.Text_Tag import Element, Text
@@ -32,6 +34,20 @@ class Tab:
         self.nodes = HTMLParser(body).parse()
 
         self.rules = DEFAULT_STYLE_SHEET.copy()
+
+        scripts = [node.attributes["src"]
+                   for node in tree_to_list(self.nodes, [])
+                   if isinstance(node,Element)
+                   and node.tag == "script"
+                   and "src" in node.attributes]
+        for script in scripts:
+            script_url = url.resolve(script)
+            try:
+                body = script_url.request()
+            except:
+                continue
+            print("Script returned", dukpy.evaljs(body))
+
         links = [node.attributes["href"]
                  for node in tree_to_list(self.nodes, [])
                  if isinstance(node, Element)
