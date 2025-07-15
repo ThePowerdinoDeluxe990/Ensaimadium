@@ -26,7 +26,7 @@ class Tab:
             if cmd.rect.bottom < self.scroll: continue
             cmd.execute(self.scroll - offset, canvas)
 
-    def load(self,url, payload=None):
+    def load(self, url, payload=None):
         self.scroll = 0
         self.url = url
         self.history.append(url)
@@ -35,8 +35,8 @@ class Tab:
 
         self.rules = DEFAULT_STYLE_SHEET.copy()
 
-        scripts = [node.attributes["src"]
-                   for node in tree_to_list(self.nodes, [])
+        scripts = [node.attributes["src"] for node
+                   in tree_to_list(self.nodes, [])
                    if isinstance(node,Element)
                    and node.tag == "script"
                    and "src" in node.attributes]
