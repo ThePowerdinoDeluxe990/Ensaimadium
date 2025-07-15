@@ -40,6 +40,7 @@ class Tab:
                    if isinstance(node,Element)
                    and node.tag == "script"
                    and "src" in node.attributes]
+
         for script in scripts:
             script_url = url.resolve(script)
             try:

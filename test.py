@@ -1,3 +1,3 @@
-import socket
-socket.getaddrinfo('localhost', 63342)
+import dukpy
 
+print(dukpy.evaljs("2+2"))
