@@ -46,6 +46,7 @@ class Tab:
             try:
                 body = script_url.request()
             except:
+                print("Script returned", dukpy.evaljs(body))
                 continue
             print("Script returned", dukpy.evaljs(body))
 
