@@ -1,5 +1,5 @@
 import dukpy
-RUNTIME_JS = open("runtime.js").read()
+RUNTIME_JS = open("./script/runtime.js").read()
 
 class JSContext:
     def __init__(self):
