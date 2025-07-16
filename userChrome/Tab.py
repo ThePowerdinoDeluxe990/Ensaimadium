@@ -8,11 +8,12 @@ from Rendering.Text_Tag import Element, Text
 from Rendering.HTMLParser import HTMLParser
 from Rendering.css.CSSParser import style, CSSParser
 from Rendering.paint_functions import paint_tree, cascade_priority
-
+from script.JSContext import JSContext
 
 DEFAULT_STYLE_SHEET = CSSParser(open("browser.css").read()).parse()
 class Tab:
     def __init__(self, tab_height):
+        self.js = None
         self.url = None
         self.history = []
         self.tab_height = tab_height
@@ -41,14 +42,15 @@ class Tab:
                    and node.tag == "script"
                    and "src" in node.attributes]
 
+        self.js = JSContext()
         for script in scripts:
             script_url = url.resolve(script)
             try:
                 body = script_url.request()
             except:
-                print("Script returned", dukpy.evaljs(body))
                 continue
             print("Script returned", dukpy.evaljs(body))
+            self.js.run(body)
 
         links = [node.attributes["href"]
                  for node in tree_to_list(self.nodes, [])
