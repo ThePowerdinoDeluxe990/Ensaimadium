@@ -30,6 +30,7 @@ class Tab:
     def load(self, url, payload=None):
         self.scroll = 0
         self.url = url
+        self.js = JSContext(self)
         self.history.append(url)
         body = url.request(payload)
         self.nodes = HTMLParser(body).parse()
@@ -42,14 +43,13 @@ class Tab:
                    and node.tag == "script"
                    and "src" in node.attributes]
 
-        self.js = JSContext()
+        self.js = JSContext(self)
         for script in scripts:
             script_url = url.resolve(script)
             try:
                 body = script_url.request()
             except:
                 continue
-            print("Script returned", dukpy.evaljs(body))
             self.js.run(body)
 
         links = [node.attributes["href"]
@@ -84,7 +84,9 @@ class Tab:
         self.scroll = max(self.scroll - SCROLL_STEP, min_y)
 
     def keypress(self, char):
+        self.js.dispatch_event("keydown", self.focus)
         if self.focus:
+            if self.js.dispatch_event("keydown", self.focus): return
             self.focus.attributes["values"] += char
             self.render()
 
@@ -108,14 +110,17 @@ class Tab:
             if isinstance(elt, Text):
                 pass
             elif elt.tag == "a" and "href" in elt.attributes:
+                if self.js.dispatch_event("click", elt): return
                 url = self.url.resolve(elt.attributes["href"])
                 return self.load(url)
             elif elt.tag == "input":
+                if self.js.dispatch_event("click", elt): return
                 elt.attributes["value"] = ""
                 self.focus = elt
                 elt.is_focused = True
                 return self.render()
             elif elt.tag == "button":
+                if self.js.dispatch_event("click", elt): return
                 while elt:
                     if elt.tag == "form" and "action" in elt.attributes:
                         return self.submit_form(elt)
@@ -125,6 +130,7 @@ class Tab:
 
 
     def submit_form(self, elt):
+        if self.js.dispatch_event("submit", elt): return
         inputs = [node for node in tree_to_list(elt, [])
                   if isinstance(node, Element)
                   and node.tag == "input"
