@@ -30,28 +30,25 @@ class Tab:
     def load(self, url, payload=None):
         self.scroll = 0
         self.url = url
-        self.js = JSContext(self)
         self.history.append(url)
         body = url.request(payload)
         self.nodes = HTMLParser(body).parse()
 
-        self.rules = DEFAULT_STYLE_SHEET.copy()
-
+        self.js = JSContext(self)
         scripts = [node.attributes["src"] for node
                    in tree_to_list(self.nodes, [])
                    if isinstance(node,Element)
                    and node.tag == "script"
                    and "src" in node.attributes]
-
-        self.js = JSContext(self)
         for script in scripts:
             script_url = url.resolve(script)
             try:
                 body = script_url.request()
             except:
                 continue
-            self.js.run(body)
+            self.js.run(script, body)
 
+        self.rules = DEFAULT_STYLE_SHEET.copy()
         links = [node.attributes["href"]
                  for node in tree_to_list(self.nodes, [])
                  if isinstance(node, Element)
@@ -84,7 +81,6 @@ class Tab:
         self.scroll = max(self.scroll - SCROLL_STEP, min_y)
 
     def keypress(self, char):
-        self.js.dispatch_event("keydown", self.focus)
         if self.focus:
             if self.js.dispatch_event("keydown", self.focus): return
             self.focus.attributes["values"] += char
@@ -116,6 +112,8 @@ class Tab:
             elif elt.tag == "input":
                 if self.js.dispatch_event("click", elt): return
                 elt.attributes["value"] = ""
+                if self.focus:
+                    self.focus.is_focused = False
                 self.focus = elt
                 elt.is_focused = True
                 return self.render()

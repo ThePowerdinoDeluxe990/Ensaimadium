@@ -5,7 +5,7 @@ from Web_Connection.URL import URL
 from tkinter.simpledialog import askstring
 
 if __name__ == "__main__":
-    Browser().new_tab(URL("https://thepowerdinodeluxe990.github.io/Ensaimadium/scripts.html"))
+    Browser().new_tab(URL("https://thepowerdinodeluxe990.github.io/Ensaimadium/"))
     tkinter.mainloop()
     #body = URL(sys.argv[1]).request()
     #nodes = HTMLParser(body).parse()

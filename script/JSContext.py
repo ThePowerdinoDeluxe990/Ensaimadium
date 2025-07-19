@@ -4,32 +4,37 @@ from Browser import tree_to_list
 from Rendering.HTMLParser import HTMLParser
 from Rendering.css.CSSParser import CSSParser
 
-RUNTIME_JS = open("./script/runtime.js").read()
-LISTENERS = {}
+
 EVENT_DISPATCH_JS = \
     "new Node(dukpy.handle).dispatchEvent(new Event(dukpy.type))"
+
+RUNTIME_JS = open("./script/runtime.js").read()
 
 class JSContext:
     def __init__(self,tab):
         self.tab = tab
+
         self.interp = dukpy.JSInterpreter()
-        self.node_to_handle = {}
-        self.handle_to_node = {}
         self.interp.export_function("log", print)
         self.interp.export_function("querySelectorAll",
                                     self.querySelectorAll)
+        self.interp.export_function("getAttribute",
+                                    self.getAttribute)
+        self.interp.export_function("innerHTML_set", self.innerHTML_set)
         self.interp.evaljs(RUNTIME_JS)
+        print(RUNTIME_JS)
+        self.node_to_handle = {}
+        self.handle_to_node = {}
 
     def dispatch_event(self, type,elt):
         handle = self.node_to_handle.get(elt, -1)
-        self.interp.evaljs(
+        do_default = self.interp.evaljs(
             EVENT_DISPATCH_JS,
             type = type,
             handle = handle
         )
-        do_default = self.interp.evaljs(
-            EVENT_DISPATCH_JS)
         return not do_default
+
     def get_handle(self, elt):
         if elt not in self.node_to_handle:
             handle = len(self.node_to_handle)

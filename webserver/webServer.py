@@ -60,10 +60,10 @@ def show_comments():
     out += "<p><input name=guest></p>"
     out += "<p><button>Sign the book!</button></p>"
     out += "<strong></strong>"
-    out += "<script src=/comment.js></script>"
     out += "</form>"
     for entry in ENTRIES:
         out += "<p>" + entry + "</p>"
+    out += "<script src=/comment.js></script>"
     return out
 
 
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         type=socket.SOCK_STREAM,
         proto=socket.IPPROTO_TCP)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind(('', 8000))
+    s.bind(('',9000))
     s.listen()
 
     while True:

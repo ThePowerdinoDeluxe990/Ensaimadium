@@ -1,3 +1,6 @@
+
+LISTENERS = {}
+
 console = { log: function(x) { call_python("log", x); } }
 document = { querySelectorAll: function(s) {
     var handles = call_python("querySelectorAll", s);
