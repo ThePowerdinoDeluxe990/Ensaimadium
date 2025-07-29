@@ -1,6 +1,8 @@
 import ssl
 import socket
 
+COOKIE_JAR = {}
+
 class URL:
     def __init__(self, url):
         self.scheme, url = url.split("://", 1)
@@ -14,8 +16,10 @@ class URL:
         elif self.scheme == "https":
             self.port = 443
 
+    def origin(self):
+        return self.scheme + "://" + self.host + ":" + str(self.port)
 
-    def request(self, payload=None):
+    def request(self, referrer, payload=None):
         s = socket.socket(
             family=socket.AF_INET,
             type=socket.SOCK_STREAM,
@@ -41,6 +45,16 @@ class URL:
         statusline = response.readline()
         version, status, explanation = statusline.split(" ", 2)
 
+        if self.host in COOKIE_JAR:
+            cookie, params = COOKIE_JAR[self.host]
+            allow_cookie = True
+            if referrer and params.get("samesite","none") == "lax":
+                if method != "GET":
+                    allow_cookie = self.host == referrer.host
+            if allow_cookie:
+                request += "Cookie: {}\r\n".format(cookie)
+
+
         response_headers = {}
         while True:
             line = response.readline()
@@ -51,9 +65,23 @@ class URL:
         assert "transfer-encoding" not in response_headers
         assert "content-encoding" not in response_headers
 
+        if "set-cookie" in response_headers:
+            cookie = response_headers["set-cookie"]
+            params = {}
+            if ";" in cookie:
+                cookie, rest = cookie.split(";", 1)
+                for param in rest.split(";"):
+                    if "=" in param:
+                        param, value = param.split("=", 1)
+                    else:
+                        value = "true"
+                    params[param.strip().casefold()] = value.casefold()
+            COOKIE_JAR[self.host] = (cookie, params)
+
+
         content = response.read()
         s.close()
-        return content
+        return response_headers, content
 
     def __str__(self):
         port_part = ":" + str(self.port)
