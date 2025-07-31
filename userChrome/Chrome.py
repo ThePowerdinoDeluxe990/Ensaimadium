@@ -1,8 +1,11 @@
+import skia
 
-from Rendering.Draw.Draw import DrawText, DrawRect
+from Rendering.Draw.Draw import DrawText, DrawRRect
 from Rendering.Draw.DrawLine import DrawLine
 from Rendering.Draw.DrawOutline import DrawOutline
-from Rendering.Layout.BlockLayout import get_font, WIDTH
+from Rendering.Layout.BlockLayout import WIDTH
+from Rendering.functions.get_font import get_font
+from Rendering.functions.linespace import linespace
 from Web_Connection.URL import URL
 from userChrome.Rect import Rect
 
@@ -15,14 +18,14 @@ class Chrome:
         self.address_bar = ""
 
         self.font = get_font(20, "normal", "roman")
-        self.font_height = self.font.metrics("linespace")
+        self.font_height = linespace(self.font)
 
         self.padding = 5
         self.tabbar_top = 0
         self.tabbar_bottom = self.font_height + 2 * self.padding
 
-        plus_width = self.font.measure("+") + 2 * self.padding
-        self.newtab_rect = Rect(
+        plus_width = self.font.measureText("+") + 2 * self.padding
+        self.newtab_rect = skia.Rect.MakeLTRB(
             self.padding, self.padding,
             self.padding + plus_width,
             self.padding + self.font_height)
@@ -31,15 +34,15 @@ class Chrome:
         self.urlbar_bottom = self.urlbar_top + \
                              self.font_height + 2 * self.padding
 
-        back_width = self.font.measure("<") + 2 * self.padding
-        self.back_rect = Rect(
+        back_width = self.font.measureText("<") + 2 * self.padding
+        self.back_rect = skia.Rect.MakeLTRB(
             self.padding,
             self.urlbar_top + self.padding,
             self.padding + back_width,
             self.urlbar_bottom - self.padding)
 
-        self.address_rect = Rect(
-            self.back_rect.top + self.padding,
+        self.address_rect = skia.Rect.MakeLTRB(
+            self.back_rect.top() + self.padding,
             self.urlbar_top + self.padding,
             WIDTH - self.padding,
             self.urlbar_bottom - self.padding)
@@ -59,7 +62,7 @@ class Chrome:
 
     def paint(self):
         cmds = []
-        cmds.append(DrawRect(
+        cmds.append(DrawRRect(
             Rect(0, 0, WIDTH, self.bottom),
             "white"))
         cmds.append(DrawLine(

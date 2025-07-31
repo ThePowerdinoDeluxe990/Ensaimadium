@@ -2,12 +2,15 @@ import urllib.parse
 
 import dukpy
 
-from Browser import tree_to_list, VSTEP, SCROLL_STEP
+
 from Rendering.Layout.DocumentLayout import DocumentLayout
 from Rendering.Text_Tag import Element, Text
 from Rendering.HTMLParser import HTMLParser
+from Rendering.constants.Constants import VSTEP, SCROLL_STEP
 from Rendering.css.CSSParser import style, CSSParser
-from Rendering.paint_functions import paint_tree, cascade_priority
+from Rendering.functions.cascade_priority import cascade_priority
+from Rendering.functions.paint_tree import paint_tree
+from Rendering.functions.tree_to_list import tree_to_list
 from Web_Connection.URL import URL
 from script.JSContext import JSContext
 
@@ -21,27 +24,25 @@ class Tab:
         self.focus = None
 
 
-    def draw(self, canvas, offset):
+    def raster(self, canvas):
         for cmd in self.display_list:
-            if cmd.rect.top > self.scroll + self.tab_height:
-                continue
-            if cmd.rect.bottom < self.scroll: continue
-            cmd.execute(self.scroll - offset, canvas)
+            cmd.execute(canvas)
 
     def load(self, url, payload=None):
+        headers, body = url.request(self.url, payload)
         self.scroll = 0
         self.url = url
         self.history.append(url)
-        headers, body = url.request(self.url, payload)
-        self.nodes = HTMLParser(body).parse()
-        self.allowed_origins = None
 
+        self.allowed_origins = None
         if "content-security-policy" in headers:
             csp = headers["content-security-policy"].split()
             if len(csp) > 0 and csp[0] == "default-src":
                 self.allowed_origins = []
                 for origin in csp[1:]:
                     self.allowed_origins.append(URL(origin).origin())
+
+        self.nodes = HTMLParser(body).parse()
 
         self.js = JSContext(self)
         scripts = [node.attributes["src"] for node
@@ -69,6 +70,9 @@ class Tab:
                  and "href" in node.attributes]
         for link in links:
             style_url = url.resolve(link)
+            if not self.allowed_request(style_url):
+                print("Blocked style", link, "due to CSP")
+                continue
             try:
                 header, body = style_url.request(url)
             except:

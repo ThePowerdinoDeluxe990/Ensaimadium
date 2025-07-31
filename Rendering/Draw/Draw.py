@@ -1,33 +1,38 @@
-from userChrome.Rect import Rect
-
+from Rendering.functions.parse_color import parse_color
+import skia
 
 class DrawText:
     def __init__(self,x1,y1,text,font,color):
 
-        self.rect = Rect(x1, y1,
-                         x1 + font.measure(text), y1 + font.metrics("linespace"))
+        self.rect = skia.Rect.MakeLTRB(
+            x1,y1,
+            x1 + font.measureText(text),
+            y1 - font.getMetrics().fAscent \
+                + font.getMetrics().fDescent
+        )
         self.text = text
         self.font = font
         self.color = color
 
     def execute(self, scroll, canvas):
-        canvas.create_text(
-            self.rect.left, self.rect.top -scroll,
-            text=self.text,
-            font=self.font,
-            anchor = "nw",
-            fill = self.color
+        paint = skia.Paint(
+            AntiAlias = True,
+            Color = parse_color(self.color),
         )
+        baseline = self.rect.top() - scroll \
+            - self.font.getMetrics().fAscent
+        canvas.drawString(self.text, float(self.rect.left()),
+                          baseline, self.font, paint)
 
-class DrawRect:
-    def __init__(self,rect, color):
+
+class DrawRRect:
+    def __init__(self,rect,radius, color):
         self.rect = rect
+        self.rrect = skia.RRect.MakeRectXY(rect, radius, radius)
         self.color = color
 
-    def execute(self,scroll,canvas):
-        canvas.create_rectangle(
-            self.rect.left,self.rect.top -scroll,
-            self.rect.right, self.rect.bottom - scroll,
-            width = 0,
-            fill=self.color
+    def execute(self,canvas):
+        paint = skia.Paint(
+            Color = parse_color(self.color),
         )
+        canvas.drawRRect(self.rrect, paint)

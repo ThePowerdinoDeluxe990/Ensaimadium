@@ -1,7 +1,7 @@
-from Rendering.Draw.Draw import DrawRect, DrawText
+from Rendering.Draw.Draw import DrawRRect, DrawText
 from Rendering.Draw.DrawLine import DrawLine
 from Rendering.Text_Tag import Text
-from Rendering.paint_functions import get_font
+from Rendering.functions.get_font import get_font
 from userChrome.Rect import Rect
 
 INPUT_WIDTH_PX = 200
@@ -51,7 +51,7 @@ class InputLayout:
         bgcolor = self.node.style.get("background-color",
                                       "transparent")
         if bgcolor != "transparent":
-            rect = DrawRect(self.self_rect(), bgcolor)
+            rect = DrawRRect(self.self_rect(), bgcolor)
             cmds.append(rect)
 
         if self.node.tag == "input":
@@ -69,7 +69,7 @@ class InputLayout:
             DrawText(self.x, self.y, text, self.font, color))
 
         if self.node.is_focused:
-            cx = self.x + self.font.measure(text)
+            cx = self.x + self.font.measureText(text)
             cmds.append(DrawLine(
                 cx, self.y, cx, self.y + self.height, "black", 1))
         return cmds

@@ -1,10 +1,14 @@
-import tkinter.font
-import tkinter
 
-from Rendering.Draw.Draw import DrawRect
+import sdl2
+import skia
+import ctypes
+
+from Rendering.Draw.Draw import DrawRRect
 from Rendering.Layout.InputLayout import InputLayout
 from Rendering.Layout.LineLayout import LineLayout
 from Rendering.Layout.TextLayout import TextLayout
+from Rendering.functions.paint_visual_effects import paint_visual_effects
+from Rendering.functions.get_font import get_font
 from userChrome.Rect import Rect
 
 INPUT_WIDTH_PX = 200
@@ -22,14 +26,6 @@ BLOCK_ELEMENTS = [
     "legend", "details", "summary"
 ]
 
-def get_font(size,weight,style):
-    key = (size, weight, style)
-    if key not in FONTS:
-        font = tkinter.font.Font(size=size, weight=weight,slant= style)
-        label = tkinter.Label(font=font)
-        FONTS[key] = (font,label)
-    return FONTS[key][0]
-
 class BlockLayout:
     def __init__(self,node,parent,previous):
         self.node = node
@@ -41,6 +37,12 @@ class BlockLayout:
         self.y = None
         self.width = None
         self.height= None
+
+    def paint_effects(self,cmds):
+        cmds = paint_visual_effects(
+            self.node, cmds, self.self_rect()
+        )
+        return cmds
 
     def new_line(self):
         self.cursor_x = 0
@@ -100,18 +102,16 @@ class BlockLayout:
     def word(self, node, word):
         weight = node.style["font-weight"]
         style = node.style["font-style"]
-        if style == "normal": style = "roman"
-        size = int(float(node.style["font-size"][:-2]) * .75)
+        size = float(node.style["font-size"][:-2]) * 0.75
         font = get_font(size, weight, style)
-
-        w = font.measure(word)
+        w = font.measureText(word)
         if self.cursor_x + w > self.width:
             self.new_line()
         line = self.children[-1]
         previous_word = line.children[-1] if line.children else None
         text = TextLayout(node, word, line, previous_word)
         line.children.append(text)
-        self.cursor_x += w + font.measure(" ")
+        self.cursor_x += w + font.measureText(" ")
 
     def layout(self):
 
@@ -175,10 +175,13 @@ class BlockLayout:
             (self.node.tag != "input" and self.node.tag != "button")
 
     def paint(self):
-        cmds = []
         bgcolor = self.node.style.get("background-color",
                                       "transparent")
+        cmds = []
         if bgcolor != "transparent":
-            draw_rect = DrawRect(self.self_rect(), bgcolor)
-            cmds.append(draw_rect)
-        return cmds
+            radius = float(
+                self.node.style.get(
+                    "border-radius", "0px")[:-2])
+            cmds.append(DrawRRect(
+                self.self_rect(), radius, bgcolor))
+

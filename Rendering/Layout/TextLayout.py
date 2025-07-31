@@ -1,14 +1,8 @@
 from Rendering.Draw.Draw import DrawText
-FONTS = {}
-import tkinter
+from Rendering.functions.linespace import linespace
+from Rendering.functions.get_font import get_font
 
-def get_font(size, weight, style):
-    key = (size, weight, style)
-    if key not in FONTS:
-        font = tkinter.font.Font(size=size, weight=weight, slant=style)
-        label = tkinter.Label(font=font)
-        FONTS[key] = (font, label)
-    return FONTS[key][0]
+FONTS = {}
 
 
 class TextLayout:
@@ -32,15 +26,15 @@ class TextLayout:
         size = int(float(self.node.style["font-size"][:-2])* .75)
         self.font = get_font(size, weight, style)
 
-        self.width = self.font.measure(self.word)
+        self.width = self.font.measureText(self.word)
 
         if self.previous:
-            space = self.previous.font.measure(" ")
+            space = self.previous.font.measureText(" ")
             self.x = self.previous.x + space + self.previous.width
         else:
             self.x = self.parent.x
 
-        self.height = self.font.metrics("linespace")
+        self.height = linespace(self.font)
 
     def paint(self):
         color = self.node.style["color"]

@@ -1,6 +1,7 @@
 from Rendering.Selectors.DescendantSelector import DescendantSelector
 from Rendering.Selectors.TagSelector import TagSelector
 from Rendering.Text_Tag import Element
+
 INHERITED_PROPERTIES = {
     "font-size": "16px",
     "font-style": "normal",
