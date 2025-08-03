@@ -3,7 +3,7 @@ import sdl2
 import skia
 import ctypes
 
-from Rendering.Draw.Draw import DrawRRect
+from Rendering.Draw.DrawRRect import DrawRRect
 from Rendering.Layout.InputLayout import InputLayout
 from Rendering.Layout.LineLayout import LineLayout
 from Rendering.Layout.TextLayout import TextLayout
@@ -67,12 +67,6 @@ class BlockLayout:
             return "inline"
         else:
             return "block"
-
-    def self_rect(self):
-        return skia.Rect.MakeLTRB(
-            self.x, self.y,
-            self.x + self.width, self.y + self.height)
-
 
     def layout_intermediate(self):
         previous = None
@@ -179,7 +173,6 @@ class BlockLayout:
             (self.node.tag != "input" and self.node.tag != "button")
 
     def paint(self):
-
         cmds = []
         bgcolor = self.node.style.get("background-color",
                                       "transparent")

@@ -1,6 +1,4 @@
-import ctypes
 import math
-import sys
 
 import sdl2
 import skia
@@ -49,7 +47,8 @@ class Browser:
             self.RED_MASK = 0x000000ff
             self.GREEN_MASK = 0x0000ff00
             self.BLUE_MASK = 0x00ff0000
-            self.ALPHA_MASK = 0xff000
+            self.ALPHA_MASK = 0xff000000
+
 
     def load(self, url):
         self.url = url
@@ -111,12 +110,6 @@ class Browser:
         canvas.clear(skia.ColorWHITE)
         self.active_tab.raster(canvas)
 
-    def raster_chrome(self):
-        canvas = self.chrome_surface.getCanvas()
-        canvas.clear(skia.ColorWHITE)
-        for cmd in self.chrome.paint():
-            cmd.execute(canvas)
-
     def handle_enter(self,e):
         if self.chrome.focus:
             self.chrome.enter()
@@ -139,7 +132,7 @@ class Browser:
         self.active_tab.scrolldown()
         self.draw()
 
-    def handle_up(self,e):
+    def handle_up(self):
         self.active_tab.scrollup()
         self.draw()
 
@@ -208,43 +201,14 @@ class Browser:
         sdl2.SDL_BlitSurface(sdl_surface, rect, window_surface, rect)
         sdl2.SDL_UpdateWindowSurface(self.sdl_window)
 
-    def handle_click(self,e):
-        if e.y < self.chrome.bottom:
-            self.focus = None
-            self.chrome.click(e.x,e.y)
-            self.raster_chrome()
-        else:
-            self.focus = "content"
-            self.chrome.blur()
-            tab_y = e.y - self.chrome.bottom
-            self.active_tab.click(e.x,tab_y)
-            self.raster_tab()
-            url = self.active_tab.url
-            tab_y = e.y - self.chrome.bottom
-            self.active_tab.click(e.x, tab_y)
-            if self.active_tab.url != url:
-                self.raster_chrome()
-        self.draw()
+    def raster_chrome(self):
+
+        canvas = self.chrome_surface.getCanvas()
+        canvas.clear(skia.ColorWHITE)
+
+        for cmd in self.chrome.paint():
+            cmd.execute(canvas)
 
     def handle_quit(self):
         sdl2.SDL_DestroyWindow(self.sdl_window)
-
-def mainloop(browser):
-    event = sdl2.SDL_Event()
-    while True:
-        while sdl2.SDL_PollEvent(ctypes.byref(event)) != 0:
-            if event.type == sdl2.SDL_QUIT:
-                browser.handle_quit()
-                sdl2.SDL_Quit()
-                sys.exit()
-            elif event.type == sdl2.SDL_MOUSEBUTTONUP:
-                browser.handle_click(event.button)
-            elif event.type == sdl2.SDL_KEYDOWN:
-                if event.key.keysym.sym == sdl2.SDLK_RETURN:
-                    browser.handle_enter()
-                elif event.key.keysym.sym == sdl2.SDLK_DOWN:
-                    browser.handle_down()
-            elif event.type == sdl2.SDL_TEXTINPUT:
-                browser.handle_key(event.text.text.decode('utf8'))
-
 

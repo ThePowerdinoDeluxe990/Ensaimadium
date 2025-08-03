@@ -1,6 +1,7 @@
 import skia
 
-from Rendering.Draw.Draw import DrawRRect, DrawText
+from Rendering.Draw.DrawText import DrawText
+from Rendering.Draw.DrawRRect import DrawRRect
 from Rendering.Draw.DrawLine import DrawLine
 from Rendering.Text_Tag import Text
 from Rendering.functions.get_font import get_font
@@ -26,16 +27,14 @@ class InputLayout:
     def layout(self):
         weight = self.node.style["font-weight"]
         style = self.node.style["font-style"]
-        size = int(float(self.node.style["font-size"][:-2]) * .75)
+        size = float(self.node.style["font-size"][:-2]) * 0.75
         self.font = get_font(size, weight, style)
+
         self.width = INPUT_WIDTH_PX
         self.height = linespace(self.font)
 
-        if style == "normal": style = "roman"
-
-
         if self.previous:
-            space = self.previous.font.measure(" ")
+            space = self.previous.font.measureText(" ")
             self.x = self.previous.x + space + self.previous.width
         else:
             self.x = self.parent.x

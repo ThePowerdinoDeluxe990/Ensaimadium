@@ -1,4 +1,4 @@
-from Rendering.Draw.Draw import DrawText
+from Rendering.Draw.DrawText import DrawText
 from Rendering.functions.linespace import linespace
 from Rendering.functions.get_font import get_font
 

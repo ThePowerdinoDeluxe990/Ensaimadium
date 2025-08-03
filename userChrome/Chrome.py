@@ -1,6 +1,7 @@
 import skia
 
-from Rendering.Draw.Draw import DrawText, DrawRRect
+from Rendering.Draw.DrawText import DrawText
+from Rendering.Draw.DrawRRect import DrawRRect
 from Rendering.Draw.DrawLine import DrawLine
 from Rendering.Draw.DrawOutline import DrawOutline
 from Rendering.Layout.BlockLayout import WIDTH
@@ -12,7 +13,6 @@ from userChrome.Rect import Rect
 
 class Chrome:
     def __init__(self, browser):
-
         self.browser = browser
         self.focus = None
         self.address_bar = ""
@@ -61,7 +61,6 @@ class Chrome:
 
 
     def paint(self):
-
         cmds = []
         cmds.append(DrawLine(
             0, self.bottom, WIDTH,
@@ -126,7 +125,7 @@ class Chrome:
 
         self.focus = None
         if self.newtab_rect.contains(x, y):
-            self.browser.new_tab(URL("https://browser.engineering/"))
+            self.browser.new_tab(URL("https://thepowerdinodeluxe990.github.io/"))
         elif self.back_rect.contains(x, y):
             self.browser.active_tab.go_back()
             self.browser.raster_chrome()

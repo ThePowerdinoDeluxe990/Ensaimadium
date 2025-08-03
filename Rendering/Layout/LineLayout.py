@@ -1,5 +1,3 @@
-from Rendering.Draw.Blend import Blend
-
 
 class LineLayout:
     def __init__(self,node,parent,previous):
