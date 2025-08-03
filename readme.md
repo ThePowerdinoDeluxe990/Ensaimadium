@@ -7,7 +7,7 @@ A simple prototype of a web browser built with python following https://browser.
 ### Dependencies
 * Python 3
 * PyInstaller
-* skia-python==87.*
+* skia-python
 * pysdl2 
 * pysdl2-dll
 
