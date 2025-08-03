@@ -38,6 +38,11 @@ class BlockLayout:
         self.width = None
         self.height= None
 
+    def self_rect(self):
+        return skia.Rect.MakeLTRB(
+            self.x, self.y, self.x + self.width, self.y + self.height
+        )
+
     def paint_effects(self,cmds):
         cmds = paint_visual_effects(
             self.node, cmds, self.self_rect()
@@ -64,8 +69,10 @@ class BlockLayout:
             return "block"
 
     def self_rect(self):
-        return Rect(self.x, self.y,
-                    self.x+ self.width, self.y + self.height)
+        return skia.Rect.MakeLTRB(
+            self.x, self.y,
+            self.x + self.width, self.y + self.height)
+
 
     def layout_intermediate(self):
         previous = None
@@ -160,14 +167,11 @@ class BlockLayout:
         previous_word = line.children[-1] if line.children else None
         input = InputLayout(node, line, previous_word)
         line.children.append(input)
-
         weight = node.style["font-weight"]
         style = node.style["font-style"]
-        if style == "normal": style = "roman"
-        size = int(float(node.style["font-size"][:-2]) * .75)
+        size = float(node.style["font-size"][:-2]) * 0.75
         font = get_font(size, weight, style)
-
-        self.cursor_x += w + font.measure(" ")
+        self.cursor_x += w + font.measureText(" ")
 
 
     def should_paint(self):
@@ -175,9 +179,10 @@ class BlockLayout:
             (self.node.tag != "input" and self.node.tag != "button")
 
     def paint(self):
+
+        cmds = []
         bgcolor = self.node.style.get("background-color",
                                       "transparent")
-        cmds = []
         if bgcolor != "transparent":
             radius = float(
                 self.node.style.get(
@@ -185,3 +190,4 @@ class BlockLayout:
             cmds.append(DrawRRect(
                 self.self_rect(), radius, bgcolor))
 
+        return cmds

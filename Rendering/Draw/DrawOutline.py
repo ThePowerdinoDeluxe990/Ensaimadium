@@ -16,4 +16,4 @@ class DrawOutline:
             StrokeWidth = self.thickness,
             Style = skia.Paint.kStroke_Style,
         )
-        canvas.drawRect(self.rect.makeOffSet(0, -scroll), paint)
+        canvas.drawRect(self.rect, paint)

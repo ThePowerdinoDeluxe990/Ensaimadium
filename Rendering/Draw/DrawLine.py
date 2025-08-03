@@ -1,3 +1,4 @@
+from Rendering.functions.parse_color import parse_color
 from userChrome.Rect import Rect
 import skia
 
@@ -7,15 +8,14 @@ class DrawLine:
         self.color = color
         self.thickness = thickness
 
-    def execute(self,scroll, canvas):
+    def execute(self, canvas):
         path = skia.Path().moveTo(
-            self.rect.left(), self.rect.top() - scroll
-        ).lineTo(self.rect.right(), self.rect.bottom() - scroll)
+            self.rect.left(), self.rect.top()) \
+            .lineTo(self.rect.right(),
+                    self.rect.bottom())
         paint = skia.Paint(
-            Color = parse_color(self.color),
-            StrokeWidth= self.thickness,
+            Color=parse_color(self.color),
+            StrokeWidth=self.thickness,
             Style=skia.Paint.kStroke_Style,
         )
         canvas.drawPath(path, paint)
-
-

@@ -1,7 +1,11 @@
+import skia
+
 from Rendering.Draw.Draw import DrawRRect, DrawText
 from Rendering.Draw.DrawLine import DrawLine
 from Rendering.Text_Tag import Text
 from Rendering.functions.get_font import get_font
+from Rendering.functions.linespace import linespace
+from Rendering.functions.paint_visual_effects import paint_visual_effects
 from userChrome.Rect import Rect
 
 INPUT_WIDTH_PX = 200
@@ -22,11 +26,13 @@ class InputLayout:
     def layout(self):
         weight = self.node.style["font-weight"]
         style = self.node.style["font-style"]
-        if style == "normal": style = "roman"
         size = int(float(self.node.style["font-size"][:-2]) * .75)
         self.font = get_font(size, weight, style)
-
         self.width = INPUT_WIDTH_PX
+        self.height = linespace(self.font)
+
+        if style == "normal": style = "roman"
+
 
         if self.previous:
             space = self.previous.font.measure(" ")
@@ -34,7 +40,6 @@ class InputLayout:
         else:
             self.x = self.parent.x
 
-        self.height = self.font.metrics("linespace")
 
 
     def should_paint(self):
@@ -42,7 +47,7 @@ class InputLayout:
 
 
     def self_rect(self):
-        return Rect(self.x, self.y,
+        return skia.Rect.MakeLTRB(self.x, self.y,
                     self.x + self.width, self.y + self.height)
 
 
@@ -51,8 +56,8 @@ class InputLayout:
         bgcolor = self.node.style.get("background-color",
                                       "transparent")
         if bgcolor != "transparent":
-            rect = DrawRRect(self.self_rect(), bgcolor)
-            cmds.append(rect)
+            radius = float(self.node.style.get("border-radius","0px")[:-2])
+            cmds.append(DrawRRect(self.self_rect(), radius, bgcolor))
 
         if self.node.tag == "input":
             text = self.node.attributes.get("value", "")
@@ -73,3 +78,6 @@ class InputLayout:
             cmds.append(DrawLine(
                 cx, self.y, cx, self.y + self.height, "black", 1))
         return cmds
+
+    def paint_effects(self, cmds):
+        return paint_visual_effects(self.node, cmds, self.self_rect())

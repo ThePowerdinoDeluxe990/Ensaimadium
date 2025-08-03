@@ -17,6 +17,7 @@ from script.JSContext import JSContext
 DEFAULT_STYLE_SHEET = CSSParser(open("browser.css").read()).parse()
 class Tab:
     def __init__(self, tab_height):
+        self.display_list = []
         self.js = None
         self.url = None
         self.history = []
