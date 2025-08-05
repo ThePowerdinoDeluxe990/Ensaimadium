@@ -16,15 +16,18 @@ class URL:
         elif self.scheme == "https":
             self.port = 443
 
-    def origin(self):
-        return self.scheme + "://" + self.host + ":" + str(self.port)
-
-    def request(self, referrer, payload=None):
+    def request(self,referrer, payload=None):
         s = socket.socket(
             family=socket.AF_INET,
             type=socket.SOCK_STREAM,
             proto=socket.IPPROTO_TCP,
         )
+
+        # No entiendo como porque o cuando
+        # Por alguna estraña razon que no puedo entender
+        # Si estas en una pagina web, haces click a un link
+        # O entras a una pagina de localhost
+        #Esto simplemente no funciona
         s.connect((self.host, self.port))
 
         if self.scheme == "https":
@@ -33,10 +36,18 @@ class URL:
 
         method = "POST" if payload else "GET"
         request = "{} {} HTTP/1.0\r\n".format(method, self.path)
-        if payload:
-            length = len(payload.encode("utf8"))
-            request += "Content-Length: {}\r\n".format(length)
         request += "Host: {}\r\n".format(self.host)
+        if self.host in COOKIE_JAR:
+            cookie, params = COOKIE_JAR[self.host]
+            allow_cookie = True
+            if referrer and params.get("samesite", "none") == "lax":
+                if method != "GET":
+                    allow_cookie = self.host == referrer.host
+            if allow_cookie:
+                request += "Cookie: {}\r\n".format(cookie)
+        if payload:
+            content_length = len(payload.encode("utf8"))
+            request += "Content-Length: {}\r\n".format(content_length)
         request += "\r\n"
         if payload: request += payload
         s.send(request.encode("utf8"))
@@ -45,16 +56,6 @@ class URL:
         statusline = response.readline()
         version, status, explanation = statusline.split(" ", 2)
 
-        if self.host in COOKIE_JAR:
-            cookie, params = COOKIE_JAR[self.host]
-            allow_cookie = True
-            if referrer and params.get("samesite","none") == "lax":
-                if method != "GET":
-                    allow_cookie = self.host == referrer.host
-            if allow_cookie:
-                request += "Cookie: {}\r\n".format(cookie)
-
-
         response_headers = {}
         while True:
             line = response.readline()
@@ -62,30 +63,30 @@ class URL:
             header, value = line.split(":", 1)
             response_headers[header.casefold()] = value.strip()
 
-        assert "transfer-encoding" not in response_headers
-        assert "content-encoding" not in response_headers
-
         if "set-cookie" in response_headers:
             cookie = response_headers["set-cookie"]
             params = {}
             if ";" in cookie:
                 cookie, rest = cookie.split(";", 1)
                 for param in rest.split(";"):
-                    if "=" in param:
+                    if '=' in param:
                         param, value = param.split("=", 1)
                     else:
                         value = "true"
                     params[param.strip().casefold()] = value.casefold()
             COOKIE_JAR[self.host] = (cookie, params)
 
+        assert "transfer-encoding" not in response_headers
+        assert "content-encoding" not in response_headers
 
         content = response.read()
         s.close()
+
         return response_headers, content
 
     def __str__(self):
         port_part = ":" + str(self.port)
-        if self.scheme == "https" and self.port == 443 :
+        if self.scheme == "https" and self.port == 443:
             port_part = ""
         if self.scheme == "http" and self.port == 80:
             port_part = ""
@@ -106,3 +107,5 @@ class URL:
             return URL(self.scheme + "://" + self.host + \
                        ":" + str(self.port) + url)
 
+    def origin(self):
+        return self.scheme + "://" + self.host + ":" + str(self.port)
