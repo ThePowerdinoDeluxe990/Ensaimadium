@@ -110,7 +110,7 @@ class Browser:
         canvas.clear(skia.ColorWHITE)
         self.active_tab.raster(canvas)
 
-    def handle_enter(self,e):
+    def handle_enter(self):
         if self.chrome.focus:
             self.chrome.enter()
             self.raster_tab()
