@@ -2,6 +2,9 @@ import math
 
 import sdl2
 import skia
+from sdl2 import SDL_Surface
+from sdl2 import ext
+from sdl2.sdlimage import IMG_Load
 
 from Rendering.constants.Constants import WIDTH, HEIGHT, VSTEP
 from Rendering.functions.tree_to_list import tree_to_list
@@ -22,9 +25,17 @@ class Browser:
     def __init__(self):
         self.chrome = Chrome(self)
 
-        self.sdl_window = sdl2.SDL_CreateWindow(b"Browser",
+        self.sdl_window = sdl2.SDL_CreateWindow(b"Ensaimadium",
                                                 sdl2.SDL_WINDOWPOS_CENTERED, sdl2.SDL_WINDOWPOS_CENTERED,
                                                 WIDTH, HEIGHT, sdl2.SDL_WINDOW_SHOWN)
+        self.icon = "./ensaimadium_icon.png"
+        image = sdl2.sdlimage.IMG_Load(self.icon.encode())
+
+        sdl2.SDL_SetWindowIcon(
+            self.sdl_window,
+            image
+        )
+        sdl2.SDL_FreeSurface(image)
         self.root_surface = skia.Surface.MakeRaster(
             skia.ImageInfo.Make(
                 WIDTH, HEIGHT,

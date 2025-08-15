@@ -19,7 +19,10 @@ A simple prototype of a web browser built with python following https://browser.
 ### Building from source
 * Git Clone https://github.com/ThePowerdinoDeluxe990/Web_Browser.git
 * Run exe_script.py
-* Move browser.css and ensaimadium.ico to dist folder
+* Move browser.css and ensaimadium.ico to ./dist/main folder
+* Create a folder called script and add runtime.js to it
+* Go to sdll2 .\Lib\site-packages\sdl2dll\dll
+* Copy all dll files and paste them into the internal folder
 
 ## Autors
 ThePowerdinoDeluxe990
