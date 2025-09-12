@@ -5,18 +5,23 @@ COOKIE_JAR = {}
 
 class URL:
     def __init__(self, url):
-        self.scheme, url = url.split("://", 1)
-        assert self.scheme in ["http","https"]
-        if "/" not in url:
-            url = url + "/"
-        self.host, url = url.split("/", 1)
-        self.path = "/" + url
-        if self.scheme == "http":
-            self.port = 80
-        elif self.scheme == "https":
-            self.port = 443
+        try:
+            self.scheme, url = url.split("://", 1)
+            assert self.scheme in ["http","https"]
+            if "/" not in url:
+                url = url + "/"
+            self.host, url = url.split("/", 1)
+            self.path = "/" + url
+            if self.scheme == "http":
+                self.port = 80
+            elif self.scheme == "https":
+                self.port = 443
+        except:
+            print("Malformed URL")
+            print(url)
+            self.__init__("https://www.thepowerdinodeluxe990.github.io")
 
-    def request(self,referrer, payload=None):
+    def request(self, referrer, payload=None):
         s = socket.socket(
             family=socket.AF_INET,
             type=socket.SOCK_STREAM,
@@ -75,9 +80,12 @@ class URL:
                         value = "true"
                     params[param.strip().casefold()] = value.casefold()
             COOKIE_JAR[self.host] = (cookie, params)
+        try:
+            assert "transfer-encoding" not in response_headers
+            assert "content-encoding" not in response_headers
 
-        assert "transfer-encoding" not in response_headers
-        assert "content-encoding" not in response_headers
+        except AssertionError as error:
+            print(error)
 
         content = response.read()
         s.close()

@@ -110,7 +110,6 @@ class Tab:
         self.scroll = min(self.scroll + SCROLL_STEP, max_y)
 
     def click(self, x, y):
-
         if self.focus:
             self.focus.is_focused = False
         self.focus = None
