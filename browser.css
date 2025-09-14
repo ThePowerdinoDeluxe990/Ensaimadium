@@ -3,6 +3,12 @@ i { font-style: italic; }
 b { font-weight: bold; }
 small { font-size: 90%; }
 big { font-size: 110%; }
+h1{ font-size: 32px}
+h2{ font-size: 24px}
+h3{ font-size: 19px}
+h4{ font-size: 16px}
+h5{ font-size: 13px}
+h6{ font-size:11px}
 input {
     font-size: 16px; font-weight: normal; font-style: normal;
     background-color: lightblue;
