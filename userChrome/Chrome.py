@@ -148,6 +148,11 @@ class Chrome:
             return True
         return False
 
+    def removeKeypress(self):
+        if self.focus == "address bar":
+            self.address_bar = self.address_bar[:-1]
+            return True
+        return False
 
     def enter(self):
         if self.focus == "address bar":

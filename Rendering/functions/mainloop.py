@@ -17,6 +17,8 @@ def mainloop(browser):
             elif event.type == sdl2.SDL_KEYDOWN:
                 if event.key.keysym.sym == sdl2.SDLK_RETURN:
                     browser.handle_enter()
+                elif event.key.keysym.sym == sdl2.SDLK_BACKSPACE:
+                    browser.handle_backspace()
                 elif event.key.keysym.sym == sdl2.SDLK_DOWN:
                     browser.handle_down()
                 elif event.key.keysym.sym == sdl2.SDLK_UP:

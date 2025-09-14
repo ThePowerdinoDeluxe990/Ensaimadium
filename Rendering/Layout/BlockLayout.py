@@ -103,7 +103,10 @@ class BlockLayout:
     def word(self, node, word):
         weight = node.style["font-weight"]
         style = node.style["font-style"]
-        size = float(node.style["font-size"][:-2]) * 0.75
+        try:
+            size = float(node.style["font-size"][:-2]) * 0.75
+        except:
+            size= 1
         font = get_font(size, weight, style)
         w = font.measureText(word)
         if self.cursor_x + w > self.width:

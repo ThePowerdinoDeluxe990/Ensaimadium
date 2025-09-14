@@ -33,7 +33,10 @@ class HTMLParser:
 
     def get_attributes(self,text):
         parts = text.split()
-        tag = parts[0].casefold()
+        try:
+            tag = parts[0].casefold()
+        except:
+            tag = "p"
         attributes = {}
         for attrpair in parts[1:]:
             if "=" in attrpair:

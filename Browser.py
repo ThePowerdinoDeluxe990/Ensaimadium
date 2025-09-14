@@ -128,6 +128,13 @@ class Browser:
             self.raster_chrome()
             self.draw()
 
+    def handle_backspace(self):
+        if self.chrome.focus:
+            self.chrome.removeKeypress()
+            self.raster_chrome()
+            self.draw()
+
+
     def handle_key(self,char):
         if not (0x20 <= ord(char) < 0x7f): return
         if self.chrome.focus:
