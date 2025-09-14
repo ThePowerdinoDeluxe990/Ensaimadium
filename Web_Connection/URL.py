@@ -28,11 +28,6 @@ class URL:
             proto=socket.IPPROTO_TCP,
         )
 
-        # No entiendo como porque o cuando
-        # Por alguna estraña razon que no puedo entender
-        # Si estas en una pagina web, haces click a un link
-        # O entras a una pagina de localhost
-        #Esto simplemente no funciona
         s.connect((self.host, self.port))
 
         if self.scheme == "https":
