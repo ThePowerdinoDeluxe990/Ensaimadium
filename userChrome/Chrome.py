@@ -125,7 +125,7 @@ class Chrome:
 
         self.focus = None
         if self.newtab_rect.contains(x, y):
-            self.browser.new_tab(URL("https://thepowerdinodeluxe990.github.io/"))
+            self.browser.new_tab(URL("https://thepowerdinodeluxe990.github.io/Ensaimadium/"))
         elif self.back_rect.contains(x, y):
             self.browser.active_tab.go_back()
             self.browser.raster_chrome()

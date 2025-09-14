@@ -19,7 +19,7 @@ class URL:
         except:
             print("Malformed URL")
             print(url)
-            self.__init__("https://www.thepowerdinodeluxe990.github.io")
+            self.__init__("https://www.thepowerdinodeluxe990.github.io/Ensaimadium/")
 
     def request(self, referrer, payload=None):
         s = socket.socket(
