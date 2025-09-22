@@ -55,7 +55,11 @@ class InputLayout:
         bgcolor = self.node.style.get("background-color",
                                       "transparent")
         if bgcolor != "transparent":
-            radius = float(self.node.style.get("border-radius","0px")[:-2])
+            if self.node.style.get("border-radius","0px")[:-2] == "" :
+                radius = 2
+            else:
+                radius = float(self.node.style.get("border-radius","0px")[:-2])
+
             cmds.append(DrawRRect(self.self_rect(), radius, bgcolor))
 
         if self.node.tag == "input":
