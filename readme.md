@@ -1,4 +1,5 @@
-# Ensaïmadium
+# Ensaïmadium ![Ensaïmadium](ensaimadium_icon72x72.png)
+
 
 ## Description
 A simple prototype of a web browser built with python following https://browser.engineering/
