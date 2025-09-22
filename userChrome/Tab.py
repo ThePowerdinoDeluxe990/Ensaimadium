@@ -98,11 +98,6 @@ class Tab:
         min_y = min(self.document.height - 2 / VSTEP + self.tab_height, 0)
         self.scroll = max(self.scroll - SCROLL_STEP, min_y)
 
-    def keypress(self, char):
-        if self.focus:
-            if self.js.dispatch_event("keydown", self.focus): return
-            self.focus.attributes["values"] += char
-            self.render()
 
     def scrolldown(self):
         max_y = max(
@@ -160,6 +155,15 @@ class Tab:
         body = body[1:]
         url = self.url.resolve(elt.attributes["action"])
         self.load(url, body)
+
+    def keypress(self, char):
+        if self.focus:
+            if self.js.dispatch_event("keydown", self.focus): return
+            try:
+                self.focus.attributes["values"] += char
+            except:
+                print("No value tag detected")
+            self.render()
 
     def allowed_request(self, url):
         return self.allowed_origins == None or \
